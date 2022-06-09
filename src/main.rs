@@ -223,34 +223,64 @@ fn main() {
             )
             .await,
         );
-        let root_node = match admin_service
-            .call(AdminRequest::CreateAdmin {
-                username: String::from("root"),
-                alias: String::from("root"),
+
+        // get a root node if already created
+        let get_node_req = match admin_service
+            .call(AdminRequest::StartAdmin {
                 passphrase: String::from("password"),
-                start: true,
             })
             .await
-            .unwrap()
         {
-            AdminResponse::CreateAdmin {
-                pubkey,
-                macaroon,
-                id,
-                token,
-                role,
-            } => {
-                let directory = admin_service.node_directory.lock().await;
-                let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
-                Some(handle.node.clone())
+            Ok(resp) => {
+                let found_node = match resp {
+                    AdminResponse::StartAdmin {
+                        pubkey,
+                        macaroon,
+                        token,
+                    } => {
+                        let directory = admin_service.node_directory.lock().await;
+                        let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
+                        Some(handle.node.clone())
+                    }
+                    _ => None,
+                };
+                found_node
             }
-            _ => None,
-        }
-        .unwrap();
+            Err(_) => None,
+        };
 
-        // Now get the node we just created
+        // Create a node if we do not have one already
+        let root_node = match get_node_req {
+            Some(node) => node,
+            None => {
+                let new_node = match admin_service
+                    .call(AdminRequest::CreateAdmin {
+                        username: String::from("root"),
+                        alias: String::from("root"),
+                        passphrase: String::from("password"),
+                        start: true,
+                    })
+                    .await
+                    .unwrap()
+                {
+                    AdminResponse::CreateAdmin {
+                        pubkey,
+                        macaroon,
+                        id,
+                        token,
+                        role,
+                    } => {
+                        let directory = admin_service.node_directory.lock().await;
+                        let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
+                        Some(handle.node.clone())
+                    }
+                    _ => None,
+                }
+                .unwrap();
+                new_node
+            }
+        };
 
-        // TODO get a root node if already created
         // got a node!
         println!("node: {}", root_node.get_pubkey());
 
