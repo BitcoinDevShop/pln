@@ -1,0 +1,11 @@
+syntax = "proto3";
+package pln;
+
+service Manager {
+    rpc GetStatus (GetStatusRequest) returns (GetStatusResponse);
+}
+
+message GetStatusRequest {}
+message GetStatusResponse {
+    bool running = 1;
+}

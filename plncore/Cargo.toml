@@ -1,12 +1,12 @@
 [package]
-name = "pln"
+name = "plncore"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[workspace]
-members = [".", "entity", "migration", "plncore"]
+[lib]
+name = "plncore"
+path = "src/lib.rs"
 
 [dependencies]
 lightning = { version = "0.0.106", features = ["max_level_trace"], git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
@@ -15,9 +15,8 @@ lightning-invoice = { version = "0.14.0", git = "https://github.com/lightningdev
 lightning-net-tokio = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
 lightning-persister = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
 lightning-background-processor = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
-senseicore = { git = "https://github.com/L2-Technology/sensei" }
 base64 = "0.13.0"
-bitcoin = "0.28.1"
+bitcoin = "0.28"
 bitcoin-bech32 = "0.12"
 bech32 = "0.8"
 futures = "0.3"
@@ -28,35 +27,25 @@ http = "0.2"
 tower = { version = "0.4", features = ["full"] }
 serde = { version = "^1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
-tokio = { version = "1.17", features = [ "io-util", "macros", "rt", "rt-multi-thread", "sync", "net", "time" ] }
+tokio = { version = "1", features = [ "io-util", "macros", "rt", "rt-multi-thread", "sync", "net", "time" ] }
 log = "0.4.16"
 env_logger = "0.9.0"
 bitcoincore-rpc = "0.15"
 bdk = { git = "https://github.com/bitcoindevkit/bdk", rev = "fbd98b4c5a88a10f8dfc22b4c54187eba4d68afe" }
-tonic = "0.6"
-prost = "0.9"
 pin-project = "1.0"
 hyper = "0.14"
 clap = { version = "3.0", features = [ "derive", "env" ] }
 headers = "0.3"
 tindercrypt = { version = "0.3.2", default-features = false }
 portpicker = "0.1"
-rusqlite = { version = "0.25.3", features = ["uuid", "bundled"] }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 macaroon = "0.2"
-tower-http = { version = "0.2.5", features = ["fs", "trace", "cors"] }
-tower-cookies = "0.4"
 dirs = "4.0"
 public-ip = "0.2"
 rust-embed="6.3.0"
 mime_guess = { version = "2" }
-entity = { path = "entity" }
-migration = { path = "migration" }
-# senseicore = { path = "senseicore" }
-plncore = { path = "plncore" }
-
-[build-dependencies]
-tonic-build = "0.6"
+entity = { path = "../entity" }
+migration = { path = "../migration" }
 
 [dev-dependencies]
 bitcoind = { version = "0.26", features = [ "22_0" ] }
