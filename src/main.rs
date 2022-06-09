@@ -7,9 +7,9 @@
 // You may not use this file except in accordance with one or both of these
 // licenses.
 
-//mod grpc;
+mod grpc;
 //mod http;
-//mod hybrid;
+mod hybrid;
 
 use senseicore::{
     chain::{bitcoind_client::BitcoindClient, manager::SenseiChainManager},
@@ -18,6 +18,9 @@ use senseicore::{
     events::SenseiEvent,
     services::admin::{AdminRequest, AdminResponse, AdminService},
 };
+
+// use plncore::services::admin::{AdminRequest, AdminResponse, AdminService};
+use plncore::services::manager::{ManagerRequest, ManagerResponse, ManagerService};
 
 use entity::sea_orm::{self, ConnectOptions};
 use migration::{Migrator, MigratorTrait};
@@ -43,8 +46,8 @@ use clap::Parser;
 
 use rust_embed::RustEmbed;
 
+use grpc::manager::{ManagerServer, ManagerService as GrpcManagerService};
 /*
-use grpc::admin::{AdminServer, AdminService as GrpcAdminService};
 use grpc::node::{NodeServer, NodeService as GrpcNodeService};
 */
 use std::net::SocketAddr;
@@ -91,7 +94,7 @@ struct SenseiArgs {
     database_url: Option<String>,
 }
 
-pub type AdminRequestResponse = (AdminRequest, Sender<AdminResponse>);
+pub type ManagerRequestResponse = (ManagerRequest, Sender<ManagerResponse>);
 fn main() {
     env_logger::init();
     macaroon::initialize().expect("failed to initialize macaroons");
@@ -224,6 +227,8 @@ fn main() {
             .await,
         );
 
+        let manager_service = Arc::new(ManagerService::new().await);
+
         // get a root node if already created
         let get_node_req = match admin_service
             .call(AdminRequest::StartAdmin {
@@ -284,9 +289,8 @@ fn main() {
         // got a node!
         println!("node: {}", root_node.get_pubkey());
 
-        //
-        //let router = Router::new()
-        //.route("/admin/*path", static_handler.into_service())
+        let router = Router::new();
+        //.route("/admin/*path", static_handler.into_service()) // TODO none of these routes
         //.fallback(get(not_found));
 
         /*
@@ -313,40 +317,39 @@ fn main() {
             ),
             None => router,
         };
+        */
 
         let port = match args.development_mode {
             Some(_) => String::from("3001"),
             None => format!("{}", config.api_port),
         };
-        */
 
-        /*
         let http_service = router
             .layer(CookieManagerLayer::new())
             .layer(Extension(admin_service.clone()))
             .into_make_service();
 
         let grpc_service = Server::builder()
-            .add_service(NodeServer::new(GrpcNodeService {
-                admin_service: admin_service.clone(),
-            }))
-            .add_service(AdminServer::new(GrpcAdminService {
-                admin_service: admin_service.clone(),
+            .add_service(ManagerServer::new(GrpcManagerService {
+                manager_service: manager_service.clone(),
             }))
             .into_service();
 
         let hybrid_service = hybrid::hybrid(http_service, grpc_service);
 
         let server = hyper::Server::bind(&addr).serve(hybrid_service);
-        */
 
         println!("yay");
 
-        /*
+        println!(
+            "manage your sensei node at http://{}:{}/admin/nodes",
+            config.api_host.clone(),
+            port
+        );
+
         if let Err(e) = server.await {
             eprintln!("server error: {}", e);
         }
-        */
     });
 }
 
