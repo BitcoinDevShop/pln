@@ -38,6 +38,8 @@ dependencies:
   go_router: ^3.1.1
   flutter_inset_box_shadow: ^1.0.8
   qr_flutter: ^4.0.0
+  protobuf: ^2.0.1
+  grpc: ^3.0.2
 
 dev_dependencies:
   flutter_test:

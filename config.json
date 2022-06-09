@@ -1,0 +1,1 @@
+{"bitcoind_rpc_host":"127.0.0.1","bitcoind_rpc_port":8133,"bitcoind_rpc_username":"bitcoin","bitcoind_rpc_password":"bitcoin","network":"bitcoin","api_host":"127.0.0.1","api_port":5401,"port_range_min":10000,"port_range_max":65535,"database_url":"sensei.db"}
