@@ -52,7 +52,7 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 - [ ] poll send
 - [ ] poll balance
 
-[ ] presentation
+- [ ] make a presentation
 
 ## Stretch Todo
 
