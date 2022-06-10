@@ -10,7 +10,11 @@
 use std::sync::Arc;
 
 pub use super::pln::manager_server::{Manager, ManagerServer};
-use super::pln::{GetStatusRequest, GetStatusResponse};
+use super::pln::{
+    GetBalanceRequest, GetBalanceResponse, GetChannelRequest, GetChannelResponse, GetStatusRequest,
+    GetStatusResponse, OpenChannelRequest, OpenChannelResponse, SendPaymentRequest,
+    SendPaymentResponse, SendStatusRequest, SendStatusResponse,
+};
 use plncore::services::manager::{ManagerRequest, ManagerResponse};
 use tonic::{metadata::MetadataMap, Response, Status};
 
@@ -131,18 +135,94 @@ impl Manager for ManagerService {
         &self,
         _request: tonic::Request<GetStatusRequest>,
     ) -> Result<tonic::Response<GetStatusResponse>, tonic::Status> {
-        /*
-        let macaroon_hex_string = raw_macaroon_from_metadata(request.metadata().clone())?;
-
-        let (_macaroon, session) = utils::macaroon_with_session_from_hex_str(&macaroon_hex_string)
-            .map_err(|_e| tonic::Status::unauthenticated("invalid macaroon"))?;
-        let pubkey = session.pubkey.clone();
-
-        */
         let request = ManagerRequest::GetStatus {};
         match self.manager_service.call(request).await {
             Ok(response) => {
                 let response: Result<GetStatusResponse, String> = response.try_into();
+                response
+                    .map(Response::new)
+                    .map_err(|_err| tonic::Status::unknown("err"))
+            }
+            Err(_err) => Err(tonic::Status::unknown("error")),
+        }
+    }
+
+    async fn open_channel(
+        &self,
+        request: tonic::Request<OpenChannelRequest>,
+    ) -> Result<tonic::Response<OpenChannelResponse>, tonic::Status> {
+        let request = ManagerRequest::OpenChannel {
+            pubkey: todo!(),
+            connection_string: todo!(),
+            amt_satoshis: todo!(),
+        };
+        match self.manager_service.call(request).await {
+            Ok(response) => {
+                let response: Result<OpenChannelResponse, String> = response.try_into();
+                response
+                    .map(Response::new)
+                    .map_err(|_err| tonic::Status::unknown("err"))
+            }
+            Err(_err) => Err(tonic::Status::unknown("error")),
+        }
+    }
+
+    async fn get_channel(
+        &self,
+        _request: tonic::Request<GetChannelRequest>,
+    ) -> Result<tonic::Response<GetChannelResponse>, tonic::Status> {
+        let request = ManagerRequest::GetChannel { id: todo!() };
+        match self.manager_service.call(request).await {
+            Ok(response) => {
+                let response: Result<GetChannelResponse, String> = response.try_into();
+                response
+                    .map(Response::new)
+                    .map_err(|_err| tonic::Status::unknown("err"))
+            }
+            Err(_err) => Err(tonic::Status::unknown("error")),
+        }
+    }
+
+    async fn send_payment(
+        &self,
+        _request: tonic::Request<SendPaymentRequest>,
+    ) -> Result<tonic::Response<SendPaymentResponse>, tonic::Status> {
+        let request = ManagerRequest::SendPaymentRequest {};
+        match self.manager_service.call(request).await {
+            Ok(response) => {
+                let response: Result<SendPaymentResponse, String> = response.try_into();
+                response
+                    .map(Response::new)
+                    .map_err(|_err| tonic::Status::unknown("err"))
+            }
+            Err(_err) => Err(tonic::Status::unknown("error")),
+        }
+    }
+
+    async fn send_status(
+        &self,
+        _request: tonic::Request<SendStatusRequest>,
+    ) -> Result<tonic::Response<SendStatusResponse>, tonic::Status> {
+        let request = ManagerRequest::SendStatusRequest {};
+        match self.manager_service.call(request).await {
+            Ok(response) => {
+                let response: Result<SendStatusResponse, String> = response.try_into();
+                response
+                    .map(Response::new)
+                    .map_err(|_err| tonic::Status::unknown("err"))
+            }
+            Err(_err) => Err(tonic::Status::unknown("error")),
+        }
+    }
+
+    async fn get_balance(
+        &self,
+        _request: tonic::Request<GetBalanceRequest>,
+    ) -> Result<tonic::Response<GetBalanceResponse>, tonic::Status> {
+        let request = ManagerRequest::GetBalanceRequest {};
+        match self.manager_service.call(request).await {
+            Ok(response) => {
+                let response: Result<GetBalanceResponse, String> = response.try_into();
                 response
                     .map(Response::new)
                     .map_err(|_err| tonic::Status::unknown("err"))

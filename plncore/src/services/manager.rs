@@ -32,12 +32,31 @@ use uuid::Uuid;
 
 pub enum ManagerRequest {
     GetStatus {},
+    OpenChannel {
+        pubkey: String,
+        connection_string: String,
+        amt_satoshis: u64,
+    },
+    GetChannel {
+        id: String,
+    },
+    SendPayment {
+        invoice: String,
+    },
+    SendStatus {
+        invoice: String,
+    },
+    GetBalance {},
 }
 
 #[derive(Serialize)]
 #[serde(untagged)]
 pub enum ManagerResponse {
     GetStatus { running: bool },
+    OpenChannel { id: String, address: String },
+    GetChannel { status: String },
+    SendPayment { status: String },
+    GetBalance { amt_satoshis: u64 },
     Error(Error),
 }
 
@@ -142,6 +161,26 @@ impl ManagerService {
                 */
                 Ok(ManagerResponse::GetStatus { running: true })
             }
+            ManagerRequest::OpenChannel {
+                pubkey,
+                connection_string,
+                amt_satoshis,
+            } => Ok(ManagerResponse::OpenChannel {
+                id: "123".to_string(),
+                address: "bc123456".to_string(),
+            }),
+            ManagerRequest::GetChannel { id } => Ok(ManagerResponse::GetChannel {
+                status: "good".to_string(),
+            }),
+            ManagerRequest::SendPayment { invoice } => Ok(ManagerResponse::SendPayment {
+                status: "pending".to_string(),
+            }),
+            ManagerRequest::SendStatus { invoice } => Ok(ManagerResponse::SendPayment {
+                status: "good".to_string(),
+            }),
+            ManagerRequest::GetBalance {} => Ok(ManagerResponse::GetBalance {
+                amt_satoshis: 100_000,
+            }),
         }
     }
 }

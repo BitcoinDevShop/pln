@@ -3,9 +3,51 @@ package pln;
 
 service Manager {
     rpc GetStatus (GetStatusRequest) returns (GetStatusResponse);
+    rpc OpenChannel (OpenChannelRequest) returns (OpenChannelResponse);
+    rpc GetChannel (GetChannelRequest) returns (GetChannelResponse);
+    rpc SendPayment (SendPaymentRequest) returns (SendPaymentResponse);
+    rpc SendStatus (SendStatusRequest) returns (SendStatusResponse);
+    rpc GetBalance (GetBalanceRequest) returns (GetBalanceResponse);
 }
 
 message GetStatusRequest {}
 message GetStatusResponse {
     bool running = 1;
+}
+
+message OpenChannelRequest {
+    string pubkey = 1;
+    string connection_string = 2;
+    uint64 amt_satoshis = 3;
+}
+message OpenChannelResponse {
+    string id = 1;
+    string address = 2;
+}
+
+message GetChannelRequest {
+    string id = 1;
+}
+message GetChannelResponse {
+    string status = 1; // good, pending, bad
+}
+
+message SendPaymentRequest {
+    string invoice = 1;
+}
+message SendPaymentResponse {
+    string status = 1; // good, pending, bad
+}
+
+message SendStatusRequest {
+    string invoice = 1;
+}
+message SendStatusResponse {
+    string status = 1; // good, pending, bad
+}
+
+message GetBalanceRequest {
+}
+message GetBalanceResponse {
+    uint64 amt_satoshis = 1; 
 }
