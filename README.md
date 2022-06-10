@@ -23,3 +23,43 @@ The GRPC should run on `5401`, but maybe 3001 lol
 ```
 protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 ```
+
+## Todo
+
+[x] Tony: embedded sensei
+[ ] Tony: custom grpc
+[ ] Tony: create node if not exists
+[ ] Paul: rough figma draft
+[ ] Paul: meme
+[x] Paul: make most of the screens
+[x] Paul + Tony: flutter grpc works
+[ ] Tony: stub rest of grpc api
+[ ] Paul: import rest of grpc api
+[ ] Tony: implement apis
+
+- [ ] open_channel
+- [ ] channel_status
+- [ ] create_send
+- [ ] send_status
+- [ ] get_balance
+
+[ ] Paul: wire up frontend to logic
+[ ] open channel
+[ ] poll channel
+[ ] create send
+[ ] poll send
+[ ] poll balance
+
+[ ] presentation
+
+## Stretch Todo
+
+[ ] Tony: subscribe apis
+[ ] Paul: hook up subscribe apis
+[ ] Tony: update sensei to ldk v107
+[ ] Tony: zero-conf
+[ ] Tony: scid
+[ ] Paul: scan QR to get endpoint for "signup"
+[ ] Tony: Token authscan
+[ ] Paul: Make it prettier
+[ ] Tony: multi-node payments (virtual channels?)
