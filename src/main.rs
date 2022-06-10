@@ -227,8 +227,6 @@ fn main() {
             .await,
         );
 
-        let manager_service = Arc::new(ManagerService::new().await);
-
         // get a root node if already created
         let get_node_req = match admin_service
             .call(AdminRequest::StartAdmin {
@@ -286,8 +284,21 @@ fn main() {
             }
         };
 
+        let manager_service =
+            Arc::new(ManagerService::new(admin_service.clone(), root_node.get_pubkey()).await);
+
+        // lets check if the node is running
+        let status_res = manager_service
+            .call(ManagerRequest::GetStatus {})
+            .await
+            .unwrap(); // TODO do not unwrap
+        let status = match status_res {
+            ManagerResponse::GetStatus { running } => running,
+            _ => false,
+        };
+
         // got a node!
-        println!("node: {}", root_node.get_pubkey());
+        println!("node: {}, running: {}", root_node.get_pubkey(), status);
 
         let router = Router::new();
         //.route("/admin/*path", static_handler.into_service()) // TODO none of these routes

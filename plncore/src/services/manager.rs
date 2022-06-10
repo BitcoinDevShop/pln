@@ -30,6 +30,8 @@ use tokio::sync::{broadcast, Mutex};
 use tokio::task::JoinHandle;
 use uuid::Uuid;
 
+use senseicore::services::admin::AdminService;
+
 pub enum ManagerRequest {
     GetStatus {},
     OpenChannel {
@@ -63,58 +65,15 @@ pub enum ManagerResponse {
 
 #[derive(Clone)]
 pub struct ManagerService {
-    /*
-pub data_dir: String,
-pub config: Arc<SenseiConfig>,
-pub node_directory: NodeDirectory,
-pub database: Arc<SenseiDatabase>,
-pub chain_manager: Arc<SenseiChainManager>,
-pub event_sender: broadcast::Sender<SenseiEvent>,
-pub available_ports: Arc<Mutex<VecDeque<u16>>>,
-pub network_graph: Arc<Mutex<SenseiNetworkGraph>>,
-*/}
+    pub admin_service: Arc<AdminService>,
+    pub root_node_pubkey: String,
+}
 
 impl ManagerService {
-    pub async fn new(/*
-        data_dir: &str,
-        config: SenseiConfig,
-        database: SenseiDatabase,
-        chain_manager: Arc<SenseiChainManager>,
-        event_sender: broadcast::Sender<SenseiEvent>,
-        */) -> Self {
-        /*
-        let mut used_ports = HashSet::new();
-        let mut available_ports = VecDeque::new();
-        database
-            .list_ports_in_use()
-            .await
-            .unwrap()
-            .into_iter()
-            .for_each(|port| {
-                used_ports.insert(port);
-            });
-
-        for port in config.port_range_min..config.port_range_max {
-            if !used_ports.contains(&port) {
-                available_ports.push_back(port);
-            }
-        }
-        */
-
+    pub async fn new(admin_service: Arc<AdminService>, root_node_pubkey: String) -> Self {
         Self {
-            /*
-            data_dir: String::from(data_dir),
-            config: Arc::new(config),
-            node_directory: Arc::new(Mutex::new(HashMap::new())),
-            database: Arc::new(database),
-            chain_manager,
-            event_sender,
-            available_ports: Arc::new(Mutex::new(available_ports)),
-            network_graph: Arc::new(Mutex::new(SenseiNetworkGraph {
-                graph: None,
-                msg_handler: None,
-            })),
-            */
+            admin_service,
+            root_node_pubkey,
         }
     }
 }
@@ -124,44 +83,62 @@ pub enum Error {
     Generic(String),
 }
 
-/*
 impl From<std::io::Error> for Error {
     fn from(e: std::io::Error) -> Self {
         Self::Generic(e.to_string())
     }
 }
 
-impl From<SenseiError> for Error {
+/*
+impl From<senseicore::SenseiError> for Error {
     fn from(e: SenseiError) -> Self {
         Self::Generic(e.to_string())
     }
 }
 */
 
+impl From<macaroon::MacaroonError> for Error {
+    fn from(_e: macaroon::MacaroonError) -> Self {
+        Self::Generic(String::from("macaroon error"))
+    }
+}
+
+impl From<migration::DbErr> for Error {
+    fn from(e: migration::DbErr) -> Self {
+        Self::Generic(e.to_string())
+    }
+}
+
 impl ManagerService {
     pub async fn call(&self, request: ManagerRequest) -> Result<ManagerResponse, Error> {
         match request {
             ManagerRequest::GetStatus {} => {
-                /*
-                let root_node = self.database.get_root_node().await?;
+                let root_node = self.admin_service.database.get_root_node().await.unwrap(); // TODO dont unwrap
                 match root_node {
                     Some(_root_node) => {
-                        let pubkey_node = self.database.get_node_by_pubkey(&pubkey).await?;
+                        let pubkey_node = self
+                            .admin_service
+                            .database
+                            .get_node_by_pubkey(self.root_node_pubkey.as_str())
+                            .await
+                            .unwrap(); // TODO dont unwrap
                         match pubkey_node {
-                            Some(pubkey_node) => {
-                                let directory = self.node_directory.lock().await;
-                                let node_running = directory.contains_key(&pubkey);
+                            Some(_pubkey_node) => {
+                                let directory = self.admin_service.node_directory.lock().await;
+                                let node_running =
+                                    directory.contains_key(self.root_node_pubkey.as_str());
 
-                                Ok(ManagerResponse::GetStatus { running: true })
+                                Ok(ManagerResponse::GetStatus {
+                                    running: node_running,
+                                })
                             }
                             None => Ok(ManagerResponse::GetStatus { running: false }),
                         }
                     }
                     None => Ok(ManagerResponse::GetStatus { running: false }),
                 }
-                */
-                Ok(ManagerResponse::GetStatus { running: true })
             }
+            // TODO
             ManagerRequest::OpenChannel {
                 pubkey,
                 connection_string,
@@ -170,15 +147,19 @@ impl ManagerService {
                 id: "123".to_string(),
                 address: "bc123456".to_string(),
             }),
+            // TODO
             ManagerRequest::GetChannel { id } => Ok(ManagerResponse::GetChannel {
                 status: "good".to_string(),
             }),
+            // TODO
             ManagerRequest::SendPayment { invoice } => Ok(ManagerResponse::SendPayment {
                 status: "pending".to_string(),
             }),
+            // TODO
             ManagerRequest::SendStatus { invoice } => Ok(ManagerResponse::SendPayment {
                 status: "good".to_string(),
             }),
+            // TODO
             ManagerRequest::GetBalance {} => Ok(ManagerResponse::GetBalance {
                 amt_satoshis: 100_000,
             }),

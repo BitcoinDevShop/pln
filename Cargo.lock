@@ -2137,6 +2137,7 @@ dependencies = [
  "public-ip",
  "rand 0.8.5",
  "rust-embed",
+ "senseicore",
  "serde",
  "serde_json",
  "serial_test",
