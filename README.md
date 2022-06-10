@@ -22,6 +22,7 @@ The GRPC should run on `5401`, but maybe 3001 lol
 
 ```
 pub global activate protoc_plugin
+export PATH="$PATH":"$HOME/resources_for_dev/flutter/.pub-cache/bin"
 ```
 
 ```
