@@ -27,10 +27,10 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 ## Todo
 
 - [x] Tony: embedded sensei
-- [ ] Tony: custom grpc
-- [ ] Tony: create node if not exists
-- [ ] Paul: rough figma draft
-- [ ] Paul: meme
+- [x] Tony: custom grpc
+- [x] Tony: create node if not exists
+- [x] Paul: rough figma draft
+- [x] Paul: meme
 - [x] Paul: make most of the screens
 - [x] Paul + Tony: flutter grpc works
 - [ ] Tony: stub rest of grpc api
