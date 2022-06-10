@@ -38,7 +38,7 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 - [x] Paul: meme
 - [x] Paul: make most of the screens
 - [x] Paul + Tony: flutter grpc works
-- [ ] Tony: stub rest of grpc api
+- [x] Tony: stub rest of grpc api
 - [ ] Paul: import rest of grpc api
 - [ ] Tony: implement apis
 - [ ] API: open_channel
