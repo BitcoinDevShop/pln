@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 
-import 'channel_fund.dart';
-import 'send.dart';
-import 'channel.dart';
-import 'home.dart';
-import 'receive.dart';
-import 'send_confirm.dart';
+import './screens/channel.dart';
+import 'screens/channel_fund.dart';
+import 'screens/home.dart';
+import 'screens/receive.dart';
+import 'screens/send.dart';
+import 'screens/send_confirm.dart';
+import 'screens/send_status.dart';
 
 /// Caches and Exposes a [GoRouter]
 final routerProvider = Provider<GoRouter>((ref) {
@@ -42,11 +43,14 @@ class RouterNotifier extends ChangeNotifier {
         GoRoute(path: "/", builder: (context, state) => const Home(), routes: [
           GoRoute(
               path: "send",
-              builder: (context, state) => const Send(),
+              builder: (context, state) => const SendScreen(),
               routes: [
                 GoRoute(
                     path: "confirm",
                     builder: (context, state) => const SendConfirm()),
+                GoRoute(
+                    path: "status",
+                    builder: (context, state) => const SendStatus()),
               ]),
           GoRoute(
               path: "receive", builder: (context, state) => const Receive()),

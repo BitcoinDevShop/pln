@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
-import 'package:pln/widgets/textField.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final Uri _url = Uri.parse('https://abytesjourney.com/lightning-privacy/');

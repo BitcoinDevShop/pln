@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class BlandButton extends StatelessWidget {
-  // final VoidCallback? onPressed;
   final VoidCallback? onPressed;
   final String text;
   const BlandButton({Key? key, required this.text, this.onPressed})
@@ -19,7 +18,6 @@ class BlandButton extends StatelessWidget {
           onPrimary: black,
           // textStyle: const TextStyle(color: black),
           primary: niceGray,
-          // TODO how do you just do a rect?
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(0),
           ),

@@ -7,10 +7,13 @@ import 'package:pln/constants.dart';
 class BlandTextField extends StatelessWidget {
   final String prompt;
   final IconData? iconData;
+  final TextEditingController controller;
+
   const BlandTextField({
     Key? key,
     required this.prompt,
     this.iconData,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -32,6 +35,7 @@ class BlandTextField extends StatelessWidget {
         ],
       ),
       child: TextField(
+        controller: controller,
         expands: false,
         // style: TextStyle(fontSize: 20.0, color: Colors.black45),
         decoration: InputDecoration(
