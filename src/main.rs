@@ -305,9 +305,10 @@ fn main() {
         /*
         let new_chan_res = manager_service
             .call(ManagerRequest::OpenChannel {
-                pubkey: "".to_string(),
-                connection_string: "".to_string(),
-                amt_satoshis: 1000,
+                pubkey: "03eaf1a5f8f1b7a4aca2626ff869f73455c77d86c89807f9c260e2dc16bd4bdbd5"
+                    .to_string(),
+                connection_string: "127.0.0.1:9734".to_string(),
+                amt_satoshis: 20_000,
             })
             .await
             .unwrap(); // TODO do not unwrap
