@@ -29,6 +29,12 @@ export PATH="$PATH":"$HOME/resources_for_dev/flutter/.pub-cache/bin"
 protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 ```
 
+### Paul's polar setup
+
+cargo run -- --development-mode=true --network=regtest --bitcoind-rpc-host=localhost --bitcoind-rpc-port=18443 --bitcoind-rpc-username=polaruser --bitcoind-rpc-password=polarpass --data-dir=./.data --port-range-min=12000 --port-range-max=12500
+
+bitcoin-cli -named sendtoaddress address="bcrt1qmjwu997paw5pec8kp4t2qzuktw5anqyf39t3xd" amount=0.002 fee_rate=1 replaceable=true
+
 ## Todo
 
 - [x] Tony: embedded sensei
@@ -48,11 +54,12 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 - [ ] API: send_status
 - [ ] API: get_balance
 - [ ] Paul: wire up frontend to logic
-- [ ] LOGIC: open channel
-- [ ] LOGIC: poll channel
-- [ ] LOGIC: create send
-- [ ] LOGIC: poll send
-- [ ] LOGIC: poll balance
+- [x] LOGIC: open channel
+- [x] LOGIC: poll channel
+- [x] LOGIC: create send
+- [x] LOGIC: poll send
+- [x] LOGIC: poll balance
+- [ ] Paul + Tony: make sure everything actually works
 - [ ] Paul + Tony: make a presentation
 
 ## Stretch Todo
@@ -67,3 +74,11 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 - [ ] Tony: Token authscan
 - [ ] Paul: Make it prettier
 - [ ] Tony: multi-node payments (virtual channels?)
+
+## Paul mini todo
+
+another lightning node on nigiri
+get its connection string
+paste connection string in create channel
+use nigiri to send money to bitcoin address in fund channel
+it should create the channel

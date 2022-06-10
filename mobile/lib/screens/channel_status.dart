@@ -6,7 +6,27 @@ import 'package:pln/grpc.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:pln/widgets/key_value.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+
+final channelStatusStreamProvider = StreamProvider.autoDispose<String?>((ref) {
+  Stream<String?> getStatus() async* {
+    var shouldPoll = true;
+    while (shouldPoll) {
+      await Future.delayed(const Duration(seconds: 1));
+      await ref.read(channelProvider.notifier).checkChannelStatus();
+      final status = ref.read(channelProvider)?.status;
+      if (status == "good") {
+        shouldPoll = false;
+        yield status;
+      } else {
+        yield status;
+      }
+    }
+  }
+
+  return getStatus();
+});
 
 class ChannelStatus extends ConsumerWidget {
   const ChannelStatus({Key? key}) : super(key: key);
@@ -14,24 +34,15 @@ class ChannelStatus extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final channel = ref.read(channelProvider);
-
-    final channelFutureProvider = FutureProvider<String>(
-      (ref) async {
-        await Future.delayed(const Duration(milliseconds: 200));
-        final response = await plnClient
-            .getChannel(GetChannelRequest(id: channel?.id)); // our future
-        return response.status; //returns a list of all the hospitals
-      },
-    );
-
-    _refresh() async {
-      ref.refresh(channelFutureProvider);
-    }
+    final channelNotifier = ref.read(channelProvider.notifier);
+    final channelStreamProvider = ref.watch(channelStatusStreamProvider);
 
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "Creating Channel...",
+                title: channel?.status == "good"
+                    ? "Channel Opened!"
+                    : "Opening Channel...",
                 closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -39,14 +50,30 @@ class ChannelStatus extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 24),
+                      // Text(chann?.status ?? "..."),
+                      KeyValue(
+                          k: "Channel Open Status",
+                          vw: channelStreamProvider.when(
+                              data: (data) => Text(
+                                  data ?? "no status something went wrong?"),
+                              loading: () => const Padding(
+                                    padding: EdgeInsets.all(4.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                              error: (err, _) => Text(err.toString()))),
                       const SizedBox(height: 0),
-                      const Text("..."),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           BlandButton(
-                            text: "Poll",
-                            onPressed: _refresh,
+                            text: channel?.status == "good"
+                                ? "Nice"
+                                : "Let me go home this is boring",
+                            onPressed: () {
+                              channelNotifier.clear();
+                              context.go("/");
+                            },
                           )
                         ],
                       )

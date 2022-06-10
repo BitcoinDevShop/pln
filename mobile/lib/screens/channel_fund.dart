@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pln/data/channel.dart';
@@ -14,6 +15,7 @@ class ChannelFund extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final channel = ref.read(channelProvider);
+    final channelNotifier = ref.read(channelProvider.notifier);
 
     return SafeArea(
         child: Scaffold(
@@ -25,7 +27,7 @@ class ChannelFund extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 24),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -40,12 +42,25 @@ class ChannelFund extends ConsumerWidget {
                           Text(channel?.fundingAddress ?? "BAD"),
                         ],
                       ),
+                      const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           BlandButton(
+                              text: "Copy",
+                              onPressed: () async {
+                                Clipboard.setData(ClipboardData(
+                                    text: channel?.fundingAddress));
+                              }),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          BlandButton(
                               text: "Continue",
-                              onPressed: () => context.go("/channel/status")),
+                              onPressed: () async {
+                                channelNotifier.startPolling();
+                                context.go("/channel/status");
+                              }),
                         ],
                       )
                     ]))));

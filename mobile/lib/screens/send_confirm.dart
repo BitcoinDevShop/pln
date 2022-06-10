@@ -32,17 +32,22 @@ class SendConfirm extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 24.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const KeyValue(k: "Amount", v: "1000 sats"),
+                          KeyValue(
+                              k: "Amount",
+                              v: send?.amountSats != null
+                                  ? "${send?.amountSats} sats"
+                                  : ""),
                           const SizedBox(height: 12),
                           KeyValue(
                               k: "Invoice",
                               v: send?.invoice ?? "no invoice..."),
                           const SizedBox(height: 12),
-                          const KeyValue(k: "Memo", v: "For drugs"),
+                          KeyValue(
+                              k: "Memo", v: send?.description ?? "For drugs"),
                           const SizedBox(height: 12),
                           Container(
                               color: lime,
@@ -52,6 +57,7 @@ class SendConfirm extends ConsumerWidget {
                               ))
                         ],
                       ),
+                      const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

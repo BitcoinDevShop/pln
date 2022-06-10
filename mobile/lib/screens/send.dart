@@ -17,7 +17,7 @@ class SendScreen extends ConsumerWidget {
     _create() async {
       try {
         await sendNotifier
-            .createSendState(Send(invoice: invoiceTextController.text))
+            .createSendFromInvoice(invoiceTextController.text)
             .then((_) {
           debugPrint("creating... ${invoiceTextController.text}");
           context.go("/send/confirm");
@@ -37,12 +37,13 @@ class SendScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 24.0),
                       BlandTextField(
                         controller: invoiceTextController,
                         prompt: "Paste Invoice",
                         iconData: Icons.qr_code,
                       ),
+                      const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
