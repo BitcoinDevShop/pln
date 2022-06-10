@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pln/data/channel.dart';
@@ -45,6 +46,15 @@ class ChannelFund extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          BlandButton(
+                              text: "Copy",
+                              onPressed: () async {
+                                Clipboard.setData(ClipboardData(
+                                    text: channel?.fundingAddress));
+                              }),
+                          const SizedBox(
+                            height: 12,
+                          ),
                           BlandButton(
                               text: "Continue",
                               onPressed: () async {
