@@ -51,6 +51,10 @@ nigiri rpc -sendtoaddress "bcrt1ql07aqt5mrjete9h0ds3vzeywh7ax0n6lnu4x4k" "0.002"
 
 nigiri rpc sendtoaddress { address: "bcrt1ql07aqt5mrjete9h0ds3vzeywh7ax0n6lnu4x4k", amount: 0.001, fee_rate: 1, eplaceable: true}
 
+cargo run -- --development-mode=true --network=regtest --bitcoind-rpc-host=localhost --bitcoind-rpc-port=18443 --bitcoind-rpc-username=polaruser --bitcoind-rpc-password=polarpass --data-dir=./.data --port-range-min=12000 --port-range-max=12500
+
+bitcoin-cli -named sendtoaddress address="bcrt1q5p9a3wtw5p5kqee20fv9n2u8n3pxszhwmtknrz" amount=0.002 fee_rate=1 replaceable=true
+
 ## Todo
 
 - [x] Tony: embedded sensei
