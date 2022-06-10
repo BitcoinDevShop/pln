@@ -36,23 +36,18 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 - [ ] Tony: stub rest of grpc api
 - [ ] Paul: import rest of grpc api
 - [ ] Tony: implement apis
-
-(APIs...)
-
-- [ ] open_channel
-- [ ] channel_status
-- [ ] create_send
-- [ ] send_status
-- [ ] get_balance
-
+- [ ] API: open_channel
+- [ ] API: channel_status
+- [ ] API: create_send
+- [ ] API: send_status
+- [ ] API: get_balance
 - [ ] Paul: wire up frontend to logic
-- [ ] open channel
-- [ ] poll channel
-- [ ] create send
-- [ ] poll send
-- [ ] poll balance
-
-- [ ] make a presentation
+- [ ] LOGIC: open channel
+- [ ] LOGIC: poll channel
+- [ ] LOGIC: create send
+- [ ] LOGIC: poll send
+- [ ] LOGIC: poll balance
+- [ ] Paul + Tony: make a presentation
 
 ## Stretch Todo
 
