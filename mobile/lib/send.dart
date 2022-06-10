@@ -41,8 +41,8 @@ class Send extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
         child: Scaffold(
-            appBar: PlnAppBar(
-                title: "pLN - Send", closeAction: () => context.go("/")),
+            appBar:
+                PlnAppBar(title: "Send", closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -59,7 +59,7 @@ class Send extends ConsumerWidget {
                         children: [
                           BlandButton(
                               text: "Continue",
-                              onPressed: () => debugPrint("Pressed Continue")),
+                              onPressed: () => context.go("/send/confirm")),
                           BlandButton(
                               text: "Test",
                               onPressed: () async {

@@ -4,16 +4,19 @@ import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/textField.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
-class Channel extends ConsumerWidget {
-  const Channel({Key? key}) : super(key: key);
+class ChannelFund extends ConsumerWidget {
+  const ChannelFund({Key? key}) : super(key: key);
+
+  static const address = "bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu";
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "Open Channel", closeAction: () => context.go("/")),
+                title: "Fund Channel", closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -21,26 +24,18 @@ class Channel extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 0),
-                      Column(
-                        children: const [
-                          BlandTextField(
-                              prompt: "Target Node", iconData: Icons.memory),
-                          SizedBox(
-                            height: 12,
-                          ),
-                          BlandTextField(
-                            prompt: "How Much",
-                            iconData: Icons.expand,
-                          ),
-                        ],
-                      ),
+                      QrImage(
+                          data: address,
+                          version: QrVersions.auto,
+                          // Screen width minus 40.0 for container and 48.0 for app padding
+                          // size: MediaQuery.of(context).size.width - 88.0),
+                          size: MediaQuery.of(context).size.width / 2),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           BlandButton(
-                            text: "Continue",
-                            onPressed: () => context.go("/channel/fund"),
-                          )
+                              text: "Continue",
+                              onPressed: () => debugPrint("Pressed Continue")),
                         ],
                       )
                     ]))));

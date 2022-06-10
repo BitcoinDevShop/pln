@@ -24,7 +24,7 @@ class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(title, style: Theme.of(context).textTheme.bodyText2),
+          Text(title, style: Theme.of(context).textTheme.headline1),
           backAction != null
               ? InkWell(
                   onTap: backAction,

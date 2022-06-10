@@ -85,6 +85,8 @@ flutter:
       fonts:
         - asset: fonts/Inter-Regular.ttf
           weight: 400
+        - asset: fonts/Inter-ExtraBold.ttf
+          weight: 800
   # fonts:
   #   - family: Schyler
   #     fonts:

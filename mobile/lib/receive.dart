@@ -12,8 +12,8 @@ class Receive extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
         child: Scaffold(
-            appBar: PlnAppBar(
-                title: "pLN - Receive", closeAction: () => context.go("/")),
+            appBar:
+                PlnAppBar(title: "Receive", closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
