@@ -369,9 +369,38 @@ impl ManagerService {
                 }
             }
             // TODO
-            ManagerRequest::SendPayment { invoice } => Ok(ManagerResponse::SendPayment {
-                status: "pending".to_string(),
-            }),
+            ManagerRequest::SendPayment { invoice } => {
+                // for each node in our pubkey list, attempt payment
+                let node_list = self.internal_node_map.lock().await;
+                let node_directory = self.admin_service.node_directory.lock().await;
+
+                for node_pubkey in node_list.iter() {
+                    // find the node
+                    let node = match node_directory.get(node_pubkey) {
+                        Some(Some(node_handle)) => Ok(node_handle.node.clone()),
+                        _ => Err("node not found"),
+                    }
+                    .unwrap();
+
+                    let balance_req = NodeRequest::SendPayment {
+                        invoice: invoice.clone(),
+                    };
+                    let balance_resp = node.call(balance_req).await.unwrap();
+                    let status = match balance_resp {
+                        senseicore::services::node::NodeResponse::SendPayment {} => "pending",
+                        _ => "bad",
+                    };
+                    if status == "pending" {
+                        return Ok(ManagerResponse::SendPayment {
+                            status: "pending".to_string(),
+                        });
+                    }
+                }
+
+                Ok(ManagerResponse::SendPayment {
+                    status: "bad".to_string(),
+                })
+            }
             // TODO
             ManagerRequest::SendStatus { invoice } => Ok(ManagerResponse::SendStatus {
                 status: "good".to_string(),
