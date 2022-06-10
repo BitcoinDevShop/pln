@@ -21,6 +21,10 @@ The GRPC should run on `5401`, but maybe 3001 lol
 (from mobile dir):
 
 ```
+pub global activate protoc_plugin
+```
+
+```
 protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 ```
 
