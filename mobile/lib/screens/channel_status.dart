@@ -6,6 +6,7 @@ import 'package:pln/grpc.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:pln/widgets/key_value.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 final channelStatusStreamProvider = StreamProvider.autoDispose<String?>((ref) {
@@ -34,7 +35,7 @@ class ChannelStatus extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final channel = ref.read(channelProvider);
     final channelNotifier = ref.read(channelProvider.notifier);
-    final channelWatch = ref.watch(channelProvider);
+    final channelStreamProvider = ref.watch(channelStatusStreamProvider);
 
     return SafeArea(
         child: Scaffold(
@@ -50,7 +51,17 @@ class ChannelStatus extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 24),
-                      Text(channelWatch?.status ?? "..."),
+                      // Text(chann?.status ?? "..."),
+                      KeyValue(
+                          k: "Channel Open Status",
+                          vw: channelStreamProvider.when(
+                              data: (data) => Text(
+                                  data ?? "no status something went wrong?"),
+                              loading: () => const Padding(
+                                    padding: EdgeInsets.all(4.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                              error: (err, _) => Text(err.toString()))),
                       const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

@@ -33,7 +33,7 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 
 cargo run -- --development-mode=true --network=regtest --bitcoind-rpc-host=localhost --bitcoind-rpc-port=18443 --bitcoind-rpc-username=polaruser --bitcoind-rpc-password=polarpass --data-dir=./.data --port-range-min=12000 --port-range-max=12500
 
-bitcoin-cli -named sendtoaddress address="bcrt1qjrg07hfhcuuc27zj2datdmga3pnz9rak7xe2fa" amount=0.002 fee_rate=1 replaceable=true
+bitcoin-cli -named sendtoaddress address="bcrt1qufgnuvauh75unh7at6855ghe7ngdcpmkwtgpjl" amount=0.002 fee_rate=1 replaceable=true
 
 ## Todo
 
