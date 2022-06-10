@@ -39,7 +39,9 @@ class ChannelStatus extends ConsumerWidget {
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "Creating Channel...",
+                title: channel?.status == "good"
+                    ? "Channel Opened!"
+                    : "Opening Channel...",
                 closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -49,22 +51,14 @@ class ChannelStatus extends ConsumerWidget {
                     children: [
                       const SizedBox(height: 24),
                       Text(channelWatch?.status ?? "..."),
-                      // const Text("..."),
-                      // channelWatch.when(
-                      //   data: (data) {
-                      //     return Text(data.toString());
-                      //   },
-                      //   error: (e, stack) {
-                      //     return Text('$e');
-                      //   },
-                      //   loading: () => const CircularProgressIndicator(),
-                      // ),
                       const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           BlandButton(
-                            text: "Let me go home this is boring",
+                            text: channel?.status == "good"
+                                ? "Nice"
+                                : "Let me go home this is boring",
                             onPressed: () {
                               channelNotifier.clear();
                               context.go("/");

@@ -29,31 +29,11 @@ export PATH="$PATH":"$HOME/resources_for_dev/flutter/.pub-cache/bin"
 protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 ```
 
-## nigiri commands
-
-```
-nigiri start --ln
-
-nigiri rpc getnewaddress "" "bech32"
-nigiri rpc generatetoaddress 10 "<address_from_previous_command>"
-```
-
-lnd ipub:
-03078bab52f9c327303ff26f5e48aab404ebe5bef247285c1d47ded1c2c844b2fa@localhost:9735
-
-nigiri rpc sendtoaddress address="bcrt1ql07aqt5mrjete9h0ds3vzeywh7ax0n6lnu4x4k" amount=0.001 fee_rate=1 replaceable=true
-
-nigri rpc -named sendtoaddress address="bcrt1qh28qv30xqhqnguuqdm93huk9uvpt3xz3am8u2r" amount=0.001 fee_rate=1 replaceable=true
-
-nigiri rpc sendtoaddress
-
-nigiri rpc -sendtoaddress "bcrt1ql07aqt5mrjete9h0ds3vzeywh7ax0n6lnu4x4k" "0.002" 1 true
-
-nigiri rpc sendtoaddress { address: "bcrt1ql07aqt5mrjete9h0ds3vzeywh7ax0n6lnu4x4k", amount: 0.001, fee_rate: 1, eplaceable: true}
+### Paul's polar setup
 
 cargo run -- --development-mode=true --network=regtest --bitcoind-rpc-host=localhost --bitcoind-rpc-port=18443 --bitcoind-rpc-username=polaruser --bitcoind-rpc-password=polarpass --data-dir=./.data --port-range-min=12000 --port-range-max=12500
 
-bitcoin-cli -named sendtoaddress address="bcrt1q5p9a3wtw5p5kqee20fv9n2u8n3pxszhwmtknrz" amount=0.002 fee_rate=1 replaceable=true
+bitcoin-cli -named sendtoaddress address="bcrt1qjrg07hfhcuuc27zj2datdmga3pnz9rak7xe2fa" amount=0.002 fee_rate=1 replaceable=true
 
 ## Todo
 
