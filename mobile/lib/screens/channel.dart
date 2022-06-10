@@ -55,7 +55,7 @@ class ChannelScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 24.0),
                       Column(
                         children: [
                           BlandTextField(
@@ -72,6 +72,7 @@ class ChannelScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

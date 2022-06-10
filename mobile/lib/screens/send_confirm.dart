@@ -32,7 +32,7 @@ class SendConfirm extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 24.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -52,6 +52,7 @@ class SendConfirm extends ConsumerWidget {
                               ))
                         ],
                       ),
+                      const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

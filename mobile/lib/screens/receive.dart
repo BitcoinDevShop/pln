@@ -26,7 +26,7 @@ class Receive extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 24.0),
                       Expanded(
                           child: GestureDetector(
                         onLongPress: _launchUrl,

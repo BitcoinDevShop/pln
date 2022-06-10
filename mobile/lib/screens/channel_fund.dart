@@ -14,6 +14,7 @@ class ChannelFund extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final channel = ref.read(channelProvider);
+    final channelNotifier = ref.read(channelProvider.notifier);
 
     return SafeArea(
         child: Scaffold(
@@ -25,7 +26,7 @@ class ChannelFund extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
+                      const SizedBox(height: 24),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -40,12 +41,16 @@ class ChannelFund extends ConsumerWidget {
                           Text(channel?.fundingAddress ?? "BAD"),
                         ],
                       ),
+                      const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           BlandButton(
                               text: "Continue",
-                              onPressed: () => context.go("/channel/status")),
+                              onPressed: () async {
+                                channelNotifier.startPolling();
+                                context.go("/channel/status");
+                              }),
                         ],
                       )
                     ]))));

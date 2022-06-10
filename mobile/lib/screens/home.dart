@@ -39,7 +39,6 @@ class Home extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
                       state.when(
                           data: (balance) => GestureDetector(
                               onTap: _refresh, child: Balance(balance)),

@@ -41,8 +41,9 @@ class SendNotifier extends StateNotifier<Send?> {
     }
   }
 
-  checkPayment() async {
+  checkPaymentStatus() async {
     try {
+      debugPrint("checking status for ${state?.invoice}");
       final response = await plnClient
           .sendStatus(SendStatusRequest(invoice: state?.invoice));
       debugPrint('Send status res: $response');

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pln/generated/pln.pbgrpc.dart';
@@ -14,7 +16,8 @@ class Channel {
       required this.pubkey,
       required this.connectionString,
       this.id,
-      this.fundingAddress});
+      this.fundingAddress,
+      this.status});
 
   final int amountSats;
   final String pubkey;
@@ -22,20 +25,25 @@ class Channel {
   // From the open response
   final String? id;
   final String? fundingAddress;
+  // From the status response
+  final String? status;
 
   // TODO
-  Channel copyWith({required String id, required String fundingAddress}) {
+  Channel copyWith({String? id, String? fundingAddress, String? status}) {
     return Channel(
         amountSats: amountSats,
         pubkey: pubkey,
         connectionString: connectionString,
-        id: id,
-        fundingAddress: fundingAddress);
+        id: id ?? this.id,
+        fundingAddress: fundingAddress ?? this.fundingAddress,
+        status: status ?? this.status);
   }
 }
 
 class ChannelNotifier extends StateNotifier<Channel?> {
   ChannelNotifier() : super(null);
+
+  Timer? _timer;
 
   createChannelState(Channel channel) async {
     debugPrint("creating channel...");
@@ -62,13 +70,35 @@ class ChannelNotifier extends StateNotifier<Channel?> {
       final response =
           await plnClient.getChannel(GetChannelRequest(id: state?.id));
       debugPrint("check channel response: $response");
+      state = state?.copyWith(status: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');
     }
   }
 
+  // https://github.com/herveGuigoz/adb_connect/blob/5c685906e0d200ddba0a40e1ad5ff166733c98a1/lib/modules/devices/logic/adb_service.dart
+  startPolling() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(milliseconds: 2000), (_) async {
+      if (state?.status != "bad") {
+        await checkChannelStatus();
+      } else {
+        _timer?.cancel();
+      }
+      ;
+    });
+  }
+
   clear() {
+    _timer?.cancel();
     state = null;
+  }
+
+  // TODO this isn't run when we nav away from channels, so figure out a way to run it
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }
 
