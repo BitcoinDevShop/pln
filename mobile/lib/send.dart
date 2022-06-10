@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grpc/grpc.dart';
+import 'package:pln/data/send.dart';
+import 'package:pln/grpc.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
@@ -9,21 +11,8 @@ import 'package:pln/widgets/textField.dart';
 import 'package:pln/generated/pln.pbgrpc.dart';
 
 Future<void> test() async {
-  final channel = ClientChannel(
-    'localhost',
-    port: 5401,
-    options: ChannelOptions(
-      credentials: ChannelCredentials.insecure(),
-      codecRegistry:
-          CodecRegistry(codecs: const [GzipCodec(), IdentityCodec()]),
-    ),
-  );
-  final stub = ManagerClient(channel);
-
-  // final name = args.isNotEmpty ? args[0] : 'world';
-
   try {
-    final response = await stub.getStatus(
+    final response = await plnClient.getStatus(
       GetStatusRequest(),
       // options: CallOptions(compression: const GzipCodec()),
     );
@@ -31,14 +20,26 @@ Future<void> test() async {
   } catch (e) {
     debugPrint('Caught error: $e');
   }
-  await channel.shutdown();
+  // await channel.shutdown();
 }
 
-class Send extends ConsumerWidget {
-  const Send({Key? key}) : super(key: key);
+class SendScreen extends ConsumerWidget {
+  const SendScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final invoiceTextController = TextEditingController();
+    final sendNotifier = ref.read(sendProvider.notifier);
+
+    _create() async {
+      await sendNotifier
+          .createSend(Send(invoice: invoiceTextController.text))
+          .then((_) {
+        debugPrint("creating... ${invoiceTextController.text}");
+        context.go("/send/confirm");
+      });
+    }
+
     return SafeArea(
         child: Scaffold(
             appBar:
@@ -50,7 +51,8 @@ class Send extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 0),
-                      const BlandTextField(
+                      BlandTextField(
+                        controller: invoiceTextController,
                         prompt: "Paste Invoice",
                         iconData: Icons.qr_code,
                       ),
@@ -59,12 +61,10 @@ class Send extends ConsumerWidget {
                         children: [
                           BlandButton(
                               text: "Continue",
-                              onPressed: () => context.go("/send/confirm")),
-                          BlandButton(
-                              text: "Test",
                               onPressed: () async {
-                                test();
+                                await _create();
                               }),
+                          const BlandButton(text: "Test", onPressed: test)
                         ],
                       )
                     ]))));

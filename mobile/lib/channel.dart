@@ -10,6 +10,9 @@ class Channel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // TODO just to compile not real yet
+    final textController = TextEditingController();
+
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
@@ -22,13 +25,16 @@ class Channel extends ConsumerWidget {
                     children: [
                       const SizedBox(height: 0),
                       Column(
-                        children: const [
+                        children: [
                           BlandTextField(
-                              prompt: "Target Node", iconData: Icons.memory),
+                              controller: textController,
+                              prompt: "Target Node",
+                              iconData: Icons.memory),
                           SizedBox(
                             height: 12,
                           ),
                           BlandTextField(
+                            controller: textController,
                             prompt: "How Much",
                             iconData: Icons.expand,
                           ),

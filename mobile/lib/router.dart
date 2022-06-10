@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:pln/send_status.dart';
 
 import 'channel_fund.dart';
 import 'send.dart';
@@ -42,11 +43,14 @@ class RouterNotifier extends ChangeNotifier {
         GoRoute(path: "/", builder: (context, state) => const Home(), routes: [
           GoRoute(
               path: "send",
-              builder: (context, state) => const Send(),
+              builder: (context, state) => const SendScreen(),
               routes: [
                 GoRoute(
                     path: "confirm",
                     builder: (context, state) => const SendConfirm()),
+                GoRoute(
+                    path: "status",
+                    builder: (context, state) => const SendStatus()),
               ]),
           GoRoute(
               path: "receive", builder: (context, state) => const Receive()),

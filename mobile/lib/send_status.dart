@@ -6,31 +6,26 @@ import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/key_value.dart';
 
-import 'dart:developer' as developer;
-
 import 'constants.dart';
 
-class SendConfirm extends ConsumerWidget {
-  const SendConfirm({Key? key}) : super(key: key);
+class SendStatus extends ConsumerWidget {
+  const SendStatus({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final send = ref.watch(sendProvider);
-    final sendNotifier = ref.read(sendProvider.notifier);
+    // final sendNotifier = ref.read(sendProvider.notifier);
 
-    Future<void> _sendPayment() async {
-      debugPrint("wtf");
-      await sendNotifier.pay(const Send(invoice: "abc123")).then((_) {
-        debugPrint("then...");
-        developer.log('log me', name: 'my.app.category');
-        context.go("/send/status");
-      });
-    }
+    // Future<void> _sendPayment() async {
+    //   await sendNotifier.pay(const Send(invoice: "abc123")).then((_) {
+    //     context.go("/send/status");
+    //   });
+    // }
 
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "Confirm Send", closeAction: () => context.go("/")),
+                title: "Sending...", closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -41,20 +36,7 @@ class SendConfirm extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const KeyValue(k: "Amount", v: "1000 sats"),
-                          const SizedBox(height: 12),
-                          KeyValue(
-                              k: "Invoice",
-                              v: send?.invoice ?? "no invoice..."),
-                          const SizedBox(height: 12),
-                          const KeyValue(k: "Memo", v: "For drugs"),
-                          const SizedBox(height: 12),
-                          Container(
-                              color: lime,
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text("Memos can be bad sometimes!"),
-                              ))
+                          KeyValue(k: send?.sendStatus ?? "Status", v: "..."),
                         ],
                       ),
                       Column(
@@ -62,7 +44,7 @@ class SendConfirm extends ConsumerWidget {
                         children: [
                           BlandButton(
                             text: "Send",
-                            onPressed: _sendPayment,
+                            // onPressed: _sendPayment,
                           )
                         ],
                       )
