@@ -26,16 +26,18 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 
 ## Todo
 
-[x] Tony: embedded sensei
-[ ] Tony: custom grpc
-[ ] Tony: create node if not exists
-[ ] Paul: rough figma draft
-[ ] Paul: meme
-[x] Paul: make most of the screens
-[x] Paul + Tony: flutter grpc works
-[ ] Tony: stub rest of grpc api
-[ ] Paul: import rest of grpc api
-[ ] Tony: implement apis
+- [x] Tony: embedded sensei
+- [ ] Tony: custom grpc
+- [ ] Tony: create node if not exists
+- [ ] Paul: rough figma draft
+- [ ] Paul: meme
+- [x] Paul: make most of the screens
+- [x] Paul + Tony: flutter grpc works
+- [ ] Tony: stub rest of grpc api
+- [ ] Paul: import rest of grpc api
+- [ ] Tony: implement apis
+
+(APIs...)
 
 - [ ] open_channel
 - [ ] channel_status
@@ -43,12 +45,12 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 - [ ] send_status
 - [ ] get_balance
 
-[ ] Paul: wire up frontend to logic
-[ ] open channel
-[ ] poll channel
-[ ] create send
-[ ] poll send
-[ ] poll balance
+- [ ] Paul: wire up frontend to logic
+- [ ] open channel
+- [ ] poll channel
+- [ ] create send
+- [ ] poll send
+- [ ] poll balance
 
 [ ] presentation
 
