@@ -10,19 +10,6 @@ import 'package:pln/widgets/textField.dart';
 
 import 'package:pln/generated/pln.pbgrpc.dart';
 
-Future<void> test() async {
-  try {
-    final response = await plnClient.getStatus(
-      GetStatusRequest(),
-      // options: CallOptions(compression: const GzipCodec()),
-    );
-    debugPrint('Running?: ${response.running}');
-  } catch (e) {
-    debugPrint('Caught error: $e');
-  }
-  // await channel.shutdown();
-}
-
 class SendScreen extends ConsumerWidget {
   const SendScreen({Key? key}) : super(key: key);
 
@@ -64,7 +51,6 @@ class SendScreen extends ConsumerWidget {
                               onPressed: () async {
                                 await _create();
                               }),
-                          const BlandButton(text: "Test", onPressed: test)
                         ],
                       )
                     ]))));

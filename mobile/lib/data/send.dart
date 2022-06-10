@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:pln/generated/pln.pbgrpc.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -37,6 +38,18 @@ class SendNotifier extends StateNotifier<Send?> {
         SendPaymentRequest(invoice: send.invoice),
       );
       debugPrint('Send res: ${response}');
+      state = send.copyWith(sendStatus: response.status);
+    } catch (e) {
+      debugPrint('Caught error: $e');
+    }
+  }
+
+  checkPayment() async {
+    try {
+      final response = await plnClient
+          .sendStatus(SendStatusRequest(invoice: state?.invoice));
+      debugPrint('Send status res: ${response}');
+      state = Send(invoice: state!.invoice, sendStatus: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');
     }
