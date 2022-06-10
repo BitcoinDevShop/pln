@@ -56,12 +56,12 @@ protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 
 ## Stretch Todo
 
-[ ] Tony: subscribe apis
-[ ] Paul: hook up subscribe apis
-[ ] Tony: update sensei to ldk v107
-[ ] Tony: zero-conf
-[ ] Tony: scid
-[ ] Paul: scan QR to get endpoint for "signup"
-[ ] Tony: Token authscan
-[ ] Paul: Make it prettier
-[ ] Tony: multi-node payments (virtual channels?)
+- [ ] Tony: subscribe apis
+- [ ] Paul: hook up subscribe apis
+- [ ] Tony: update sensei to ldk v107
+- [ ] Tony: zero-conf
+- [ ] Tony: scid
+- [ ] Paul: scan QR to get endpoint for "signup"
+- [ ] Tony: Token authscan
+- [ ] Paul: Make it prettier
+- [ ] Tony: multi-node payments (virtual channels?)
