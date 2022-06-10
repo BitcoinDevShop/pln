@@ -5,13 +5,45 @@ import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/text_field.dart';
 
-class Channel extends ConsumerWidget {
-  const Channel({Key? key}) : super(key: key);
+import '../data/channel.dart';
+
+class ChannelScreen extends ConsumerWidget {
+  const ChannelScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO just to compile not real yet
-    final textController = TextEditingController();
+    final targetNodeTextController = TextEditingController();
+    final sizeTextController = TextEditingController();
+    final channelNotifier = ref.read(channelProvider.notifier);
+
+    _create() async {
+      try {
+        final amount = int.tryParse(sizeTextController.text);
+
+        if (amount == null) {
+          throw ("amount blank");
+        }
+
+        final splitTarget = targetNodeTextController.text.split('@');
+
+        if (splitTarget.length != 2) {
+          throw ("invalid target string");
+        }
+
+        final pubkey = splitTarget[0];
+        final connectionString = splitTarget[1];
+
+        await channelNotifier.createChannelState(Channel(
+            amountSats: amount,
+            pubkey: pubkey,
+            connectionString: connectionString));
+        await channelNotifier.openChannel().then((_) {
+          context.go("/channel/fund");
+        });
+      } catch (e) {
+        debugPrint('Caught error: $e');
+      }
+    }
 
     return SafeArea(
         child: Scaffold(
@@ -27,14 +59,14 @@ class Channel extends ConsumerWidget {
                       Column(
                         children: [
                           BlandTextField(
-                              controller: textController,
+                              controller: targetNodeTextController,
                               prompt: "Target Node",
                               iconData: Icons.memory),
                           const SizedBox(
                             height: 12,
                           ),
                           BlandTextField(
-                            controller: textController,
+                            controller: sizeTextController,
                             prompt: "How Much",
                             iconData: Icons.expand,
                           ),
@@ -45,7 +77,7 @@ class Channel extends ConsumerWidget {
                         children: [
                           BlandButton(
                             text: "Continue",
-                            onPressed: () => context.go("/channel/fund"),
+                            onPressed: _create,
                           )
                         ],
                       )

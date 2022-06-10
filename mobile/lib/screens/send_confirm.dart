@@ -6,8 +6,6 @@ import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/key_value.dart';
 
-import 'dart:developer' as developer;
-
 import '../constants.dart';
 
 class SendConfirm extends ConsumerWidget {
@@ -19,10 +17,7 @@ class SendConfirm extends ConsumerWidget {
     final sendNotifier = ref.read(sendProvider.notifier);
 
     Future<void> _sendPayment() async {
-      debugPrint("wtf");
-      await sendNotifier.pay(const Send(invoice: "abc123")).then((_) {
-        debugPrint("then...");
-        developer.log('log me', name: 'my.app.category');
+      await sendNotifier.pay().then((_) {
         context.go("/send/status");
       });
     }

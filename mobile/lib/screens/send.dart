@@ -15,12 +15,16 @@ class SendScreen extends ConsumerWidget {
     final sendNotifier = ref.read(sendProvider.notifier);
 
     _create() async {
-      await sendNotifier
-          .createSend(Send(invoice: invoiceTextController.text))
-          .then((_) {
-        debugPrint("creating... ${invoiceTextController.text}");
-        context.go("/send/confirm");
-      });
+      try {
+        await sendNotifier
+            .createSendState(Send(invoice: invoiceTextController.text))
+            .then((_) {
+          debugPrint("creating... ${invoiceTextController.text}");
+          context.go("/send/confirm");
+        });
+      } catch (e) {
+        debugPrint('Caught error: $e');
+      }
     }
 
     return SafeArea(
