@@ -273,7 +273,7 @@ impl ManagerService {
                 status: "pending".to_string(),
             }),
             // TODO
-            ManagerRequest::SendStatus { invoice } => Ok(ManagerResponse::SendPayment {
+            ManagerRequest::SendStatus { invoice } => Ok(ManagerResponse::SendStatus {
                 status: "good".to_string(),
             }),
             // TODO
