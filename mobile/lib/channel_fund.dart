@@ -16,8 +16,7 @@ class ChannelFund extends ConsumerWidget {
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "pLN - Fund Channel",
-                closeAction: () => context.go("/")),
+                title: "Fund Channel", closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
+import 'constants.dart';
+
 class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final void Function()? backAction;
   final void Function()? closeAction;
+  final bool home;
 
-  const PlnAppBar({
-    Key? key,
-    required this.title,
-    this.backAction,
-    this.closeAction,
-  }) : super(key: key);
+  const PlnAppBar(
+      {Key? key,
+      required this.title,
+      this.backAction,
+      this.closeAction,
+      this.home = false})
+      : super(key: key);
 
   @override
   Size get preferredSize => const Size.fromHeight(120);
@@ -24,7 +28,11 @@ class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(title, style: Theme.of(context).textTheme.bodyText2),
+          Text(title,
+              style: Theme.of(context)
+                  .textTheme
+                  .headline1
+                  ?.copyWith(color: home ? blue : black)),
           backAction != null
               ? InkWell(
                   onTap: backAction,

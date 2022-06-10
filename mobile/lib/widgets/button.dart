@@ -13,6 +13,8 @@ class BlandButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          textStyle: Theme.of(context).textTheme.headline3,
           elevation: 5,
           onPrimary: black,
           // textStyle: const TextStyle(color: black),

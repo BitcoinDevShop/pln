@@ -13,8 +13,7 @@ class Channel extends ConsumerWidget {
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "pLN - Open Channel",
-                closeAction: () => context.go("/")),
+                title: "Open Channel", closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pln/router.dart';
+import 'package:pln/theme.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -22,7 +23,7 @@ class MyApp extends ConsumerWidget {
           // brightness: Brightness.light,
           primaryColor: Colors.black,
           primarySwatch: materialBlack,
-          // textTheme: TextTheme,
+          textTheme: blandTextTheme,
           backgroundColor: Colors.white,
           scaffoldBackgroundColor: Colors.white,
           fontFamily: "Inter"),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pln/pln_appbar.dart';
+import 'package:pln/widgets/balance.dart';
 import 'package:pln/widgets/button.dart';
 
 class Home extends ConsumerWidget {
@@ -11,7 +12,10 @@ class Home extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
         child: Scaffold(
-            appBar: const PlnAppBar(title: "pLN"),
+            appBar: const PlnAppBar(
+              title: "pLN",
+              home: true,
+            ),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -19,7 +23,7 @@ class Home extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 0),
-                      const Text("0 sats"),
+                      const Balance(420),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
