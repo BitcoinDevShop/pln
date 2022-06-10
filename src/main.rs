@@ -300,6 +300,25 @@ fn main() {
         // got a node!
         println!("node: {}, running: {}", root_node.get_pubkey(), status);
 
+        // now lets create a new node and address
+        //TODO delete this
+        /*
+        let new_chan_res = manager_service
+            .call(ManagerRequest::OpenChannel {
+                pubkey: "".to_string(),
+                connection_string: "".to_string(),
+                amt_satoshis: 1000,
+            })
+            .await
+            .unwrap(); // TODO do not unwrap
+        let address = match new_chan_res {
+            ManagerResponse::OpenChannel { id, address } => address,
+            _ => "no".to_string(),
+        };
+
+        println!("address: {}", address);
+        */
+
         let router = Router::new();
         //.route("/admin/*path", static_handler.into_service()) // TODO none of these routes
         //.fallback(get(not_found));

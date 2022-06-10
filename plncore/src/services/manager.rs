@@ -20,8 +20,12 @@ use entity::node::{self, NodeRole};
 use entity::sea_orm::{ActiveModelTrait, ActiveValue, EntityTrait};
 use entity::{access_token, seconds_since_epoch};
 use futures::stream::{self, StreamExt};
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
+
 use lightning_background_processor::BackgroundProcessor;
 use macaroon::Macaroon;
+use senseicore::services::node::NodeRequest;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::atomic::Ordering;
@@ -30,7 +34,7 @@ use tokio::sync::{broadcast, Mutex};
 use tokio::task::JoinHandle;
 use uuid::Uuid;
 
-use senseicore::services::admin::AdminService;
+use senseicore::services::admin::{AdminRequest, AdminResponse, AdminService};
 
 pub enum ManagerRequest {
     GetStatus {},
@@ -143,10 +147,82 @@ impl ManagerService {
                 pubkey,
                 connection_string,
                 amt_satoshis,
-            } => Ok(ManagerResponse::OpenChannel {
-                id: "123".to_string(),
-                address: "bc123456".to_string(),
-            }),
+            } => {
+                // First create a new node
+                let username = String::from_utf8(
+                    thread_rng()
+                        .sample_iter(&Alphanumeric)
+                        .take(10)
+                        .collect::<Vec<_>>(),
+                )
+                .unwrap();
+                let alias = String::from_utf8(
+                    thread_rng()
+                        .sample_iter(&Alphanumeric)
+                        .take(8)
+                        .collect::<Vec<_>>(),
+                )
+                .unwrap();
+
+                let create_node_req = AdminRequest::CreateNode {
+                    username,
+                    alias,
+                    passphrase: "password".to_string(),
+                    start: true,
+                };
+                let create_node_resp = self.admin_service.call(create_node_req).await.unwrap(); // TODO do not unwrap
+                let new_node = match create_node_resp {
+                    AdminResponse::CreateNode {
+                        pubkey,
+                        macaroon,
+                        listen_addr,
+                        listen_port,
+                        id,
+                    } => {
+                        // get the node back from the db
+                        let db_node = self
+                            .admin_service
+                            .database
+                            .get_node_by_pubkey(pubkey.as_str())
+                            .await
+                            .unwrap(); // TODO dont unwrap, but should have
+                        db_node
+                    }
+                    _ => None,
+                }
+                .unwrap();
+
+                // Then get an address for the node
+                let node_directory = self.admin_service.node_directory.lock().await;
+                let addr = match node_directory.get(&new_node.pubkey) {
+                    Some(Some(node_handle)) => {
+                        let node_req = NodeRequest::GetUnusedAddress {};
+                        let address_resp = node_handle.node.call(node_req).await.unwrap();
+                        let address = match address_resp {
+                            senseicore::services::node::NodeResponse::GetUnusedAddress {
+                                address,
+                            } => Ok(address),
+                            _ => Err("some error"),
+                        };
+
+                        address
+                    }
+                    _ => Err("Could not generate address"),
+                }
+                .unwrap(); // TODO dont unwrap, could still be spinning up
+
+                // make an ID for the temp channel?
+                //
+                // Return the response
+                //
+                // Loop through waiting for funding
+                //
+                // Once getting funding, open channel with that node
+                Ok(ManagerResponse::OpenChannel {
+                    id: "123".to_string(),
+                    address: addr,
+                })
+            }
             // TODO
             ManagerRequest::GetChannel { id } => Ok(ManagerResponse::GetChannel {
                 status: "good".to_string(),
