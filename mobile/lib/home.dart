@@ -12,7 +12,10 @@ class Home extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
         child: Scaffold(
-            appBar: const PlnAppBar(title: "pLN"),
+            appBar: const PlnAppBar(
+              title: "pLN",
+              home: true,
+            ),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(

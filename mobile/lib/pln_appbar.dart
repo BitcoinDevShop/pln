@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'constants.dart';
+
 class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final void Function()? backAction;
@@ -26,7 +28,11 @@ class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(title, style: Theme.of(context).textTheme.headline1),
+          Text(title,
+              style: Theme.of(context)
+                  .textTheme
+                  .headline1
+                  ?.copyWith(color: home ? blue : black)),
           backAction != null
               ? InkWell(
                   onTap: backAction,
