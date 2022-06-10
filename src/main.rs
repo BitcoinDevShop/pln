@@ -303,6 +303,7 @@ fn main() {
 
         // now lets create a new node and address
         //TODO delete this
+        /*
         let new_chan_res = manager_service
             .clone()
             .call(ManagerRequest::OpenChannel {
@@ -344,6 +345,7 @@ fn main() {
                 println!("channel_status: {}", chan_status);
             }
         });
+        */
 
         let router = Router::new();
         //.route("/admin/*path", static_handler.into_service()) // TODO none of these routes
