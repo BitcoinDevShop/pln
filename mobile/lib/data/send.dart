@@ -9,12 +9,9 @@ import '../grpc.dart';
 class Send {
   const Send({required this.invoice, this.sendStatus});
 
-  // final int amountSats;
   final String? invoice;
   final String? sendStatus;
 
-  // // Since Receive is immutable, we implement a method that allows cloning the
-  // // Receive with slightly different content.
   Send copyWith({String? invoice, String? sendStatus}) {
     return Send(
       sendStatus: sendStatus ?? this.sendStatus,
@@ -26,19 +23,19 @@ class Send {
 class SendNotifier extends StateNotifier<Send?> {
   SendNotifier() : super(null);
 
-  createSend(Send send) async {
+  createSendState(Send send) async {
     debugPrint("creating send...");
     state = send;
   }
 
-  pay(Send send) async {
+  pay() async {
     try {
       debugPrint("paying...");
       final response = await plnClient.sendPayment(
-        SendPaymentRequest(invoice: send.invoice),
+        SendPaymentRequest(invoice: state?.invoice),
       );
       debugPrint('Send res: $response');
-      state = send.copyWith(sendStatus: response.status);
+      state = state?.copyWith(sendStatus: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');
     }
@@ -49,7 +46,7 @@ class SendNotifier extends StateNotifier<Send?> {
       final response = await plnClient
           .sendStatus(SendStatusRequest(invoice: state?.invoice));
       debugPrint('Send status res: $response');
-      state = Send(invoice: state!.invoice, sendStatus: response.status);
+      state = state?.copyWith(sendStatus: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');
     }
