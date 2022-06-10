@@ -4,13 +4,15 @@ class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final void Function()? backAction;
   final void Function()? closeAction;
+  final bool home;
 
-  const PlnAppBar({
-    Key? key,
-    required this.title,
-    this.backAction,
-    this.closeAction,
-  }) : super(key: key);
+  const PlnAppBar(
+      {Key? key,
+      required this.title,
+      this.backAction,
+      this.closeAction,
+      this.home = false})
+      : super(key: key);
 
   @override
   Size get preferredSize => const Size.fromHeight(120);

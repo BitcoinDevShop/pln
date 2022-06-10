@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
-import 'package:pln/widgets/textField.dart';
+import 'package:pln/widgets/key_value.dart';
 
-import 'package:pln/generated/pln.pbgrpc.dart';
+import 'constants.dart';
 
 class SendConfirm extends ConsumerWidget {
   const SendConfirm({Key? key}) : super(key: key);
@@ -14,8 +14,8 @@ class SendConfirm extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
         child: Scaffold(
-            appBar:
-                PlnAppBar(title: "Send", closeAction: () => context.go("/")),
+            appBar: PlnAppBar(
+                title: "Confirm Send", closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -25,12 +25,19 @@ class SendConfirm extends ConsumerWidget {
                       const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text("Amount\n1000 sats"),
-                          SizedBox(height: 12),
-                          Text("Invoice\nabc123... 123abc"),
-                          SizedBox(height: 12),
-                          Text("Memo\nfor drugs"),
+                        children: [
+                          const KeyValue(k: "Amount", v: "1000 sats"),
+                          const SizedBox(height: 12),
+                          const KeyValue(k: "Invoice", v: "abc123...123abc"),
+                          const SizedBox(height: 12),
+                          const KeyValue(k: "Memo", v: "For drugs"),
+                          const SizedBox(height: 12),
+                          Container(
+                              color: lime,
+                              child: const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text("Memos can be bad sometimes!"),
+                              ))
                         ],
                       ),
                       Column(

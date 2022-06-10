@@ -10,10 +10,10 @@ const TextTheme blandTextTheme = TextTheme(
     fontWeight: FontWeight.w800,
   ),
   headline2: TextStyle(
-    fontFamily: "Inter",
-    color: black,
-    fontSize: 16,
-  ),
+      fontFamily: "Inter",
+      color: black,
+      fontSize: 44,
+      fontWeight: FontWeight.w800),
   headline3: TextStyle(
     fontFamily: "Inter",
     color: black,
@@ -31,10 +31,10 @@ const TextTheme blandTextTheme = TextTheme(
     fontSize: 16,
   ),
   headline6: TextStyle(
-    fontFamily: "Inter",
-    color: black,
-    fontSize: 16,
-  ),
+      fontFamily: "Inter",
+      color: black,
+      fontSize: 16,
+      fontWeight: FontWeight.w800),
   bodyText1: TextStyle(
     fontFamily: "Inter",
     color: black,
