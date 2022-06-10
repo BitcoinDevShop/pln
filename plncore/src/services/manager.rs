@@ -377,9 +377,35 @@ impl ManagerService {
                 status: "good".to_string(),
             }),
             // TODO
-            ManagerRequest::GetBalance {} => Ok(ManagerResponse::GetBalance {
-                amt_satoshis: 100_000,
-            }),
+            ManagerRequest::GetBalance {} => {
+                // get the amount from each of the nodes we have saved
+                let mut amt_satoshis = 0;
+
+                // for each node in our pubkey list, check the channel status
+                let node_list = self.internal_node_map.lock().await;
+                let node_directory = self.admin_service.node_directory.lock().await;
+
+                for node_pubkey in node_list.iter() {
+                    // find the node
+                    let node = match node_directory.get(node_pubkey) {
+                        Some(Some(node_handle)) => Ok(node_handle.node.clone()),
+                        _ => Err("node not found"),
+                    }
+                    .unwrap();
+
+                    let balance_req = NodeRequest::GetBalance {};
+                    let balance_resp = node.call(balance_req).await.unwrap();
+                    let balance = match balance_resp {
+                        senseicore::services::node::NodeResponse::GetBalance {
+                            balance_satoshis,
+                        } => balance_satoshis,
+                        _ => 0,
+                    };
+                    amt_satoshis += balance;
+                }
+
+                Ok(ManagerResponse::GetBalance { amt_satoshis })
+            }
         }
     }
 }
