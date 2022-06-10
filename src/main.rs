@@ -289,6 +289,7 @@ fn main() {
 
         // lets check if the node is running
         let status_res = manager_service
+            .clone()
             .call(ManagerRequest::GetStatus {})
             .await
             .unwrap(); // TODO do not unwrap
@@ -302,8 +303,8 @@ fn main() {
 
         // now lets create a new node and address
         //TODO delete this
-        /*
         let new_chan_res = manager_service
+            .clone()
             .call(ManagerRequest::OpenChannel {
                 pubkey: "03eaf1a5f8f1b7a4aca2626ff869f73455c77d86c89807f9c260e2dc16bd4bdbd5"
                     .to_string(),
@@ -312,13 +313,37 @@ fn main() {
             })
             .await
             .unwrap(); // TODO do not unwrap
-        let address = match new_chan_res {
-            ManagerResponse::OpenChannel { id, address } => address,
+        let channel_id = match new_chan_res {
+            ManagerResponse::OpenChannel { id, address } => {
+                println!("address: {}", address);
+                id
+            }
             _ => "no".to_string(),
         };
 
-        println!("address: {}", address);
-        */
+        let channel_id_copy = channel_id.clone();
+        let manager_service_copy = manager_service.clone();
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(Duration::from_secs(5));
+            loop {
+                interval.tick().await;
+                println!("checking channel id: {}", channel_id_copy);
+
+                let new_chan_status_res = manager_service_copy
+                    .clone()
+                    .call(ManagerRequest::GetChannel {
+                        id: channel_id_copy.clone(),
+                    })
+                    .await
+                    .unwrap(); // TODO do not unwrap
+
+                let chan_status = match new_chan_status_res {
+                    ManagerResponse::GetChannel { status } => status,
+                    _ => "bad".to_string(),
+                };
+                println!("channel_status: {}", chan_status);
+            }
+        });
 
         let router = Router::new();
         //.route("/admin/*path", static_handler.into_service()) // TODO none of these routes

@@ -26,6 +26,7 @@ use rand::{thread_rng, Rng};
 use lightning_background_processor::BackgroundProcessor;
 use macaroon::Macaroon;
 use senseicore::services::node::{NodeRequest, OpenChannelInfo};
+use senseicore::services::PaginationRequest;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::atomic::Ordering;
@@ -72,6 +73,8 @@ pub enum ManagerResponse {
 pub struct ManagerService {
     pub admin_service: Arc<AdminService>,
     pub root_node_pubkey: String,
+    internal_channel_id_map: Arc<Mutex<HashMap<String, String>>>,
+    internal_node_map: Arc<Mutex<Vec<String>>>,
 }
 
 impl ManagerService {
@@ -79,6 +82,8 @@ impl ManagerService {
         Self {
             admin_service,
             root_node_pubkey,
+            internal_channel_id_map: Arc::new(Mutex::new(HashMap::new())),
+            internal_node_map: Arc::new(Mutex::new(vec![])),
         }
     }
 }
@@ -193,6 +198,11 @@ impl ManagerService {
                 }
                 .unwrap();
 
+                self.internal_node_map
+                    .lock()
+                    .await
+                    .push(new_node.pubkey.clone());
+
                 // Then get an address for the node
                 let node_directory = self.admin_service.node_directory.lock().await;
                 let node = match node_directory.get(&new_node.pubkey) {
@@ -211,7 +221,11 @@ impl ManagerService {
                 }
                 .unwrap();
 
-                // TODO make an ID for the temp channel to map to?
+                // make an ID for the temp channel to map to?
+                let mut rng = rand::thread_rng();
+                let internal_channel_id: u16 = rng.gen();
+                let internal_channel_id_copy = Arc::new(internal_channel_id);
+                let map = self.internal_channel_id_map.clone();
 
                 // Loop through waiting for funding
                 let node_spawn = node.clone();
@@ -224,7 +238,10 @@ impl ManagerService {
                         let balance = match balance_resp {
                             senseicore::services::node::NodeResponse::GetBalance {
                                 balance_satoshis,
-                            } => Some(balance_satoshis),
+                            } => {
+                                dbg!(balance_satoshis);
+                                Some(balance_satoshis)
+                            }
                             _ => None,
                         };
 
@@ -249,8 +266,14 @@ impl ManagerService {
                                     results,
                                 } => Some(results[0].temp_channel_id.clone().unwrap()),
                                 _ => None,
-                            };
-                            println!("channel_id: {}", channel_id.unwrap());
+                            }
+                            .unwrap();
+
+                            // TODO map channel id to an internal id
+                            println!("channel_id: {}", channel_id);
+                            map.lock()
+                                .await
+                                .insert(internal_channel_id_copy.to_string(), channel_id);
                             return;
                         }
                         // TODO delete
@@ -260,14 +283,91 @@ impl ManagerService {
 
                 // Return the response
                 Ok(ManagerResponse::OpenChannel {
-                    id: "123".to_string(),
+                    id: internal_channel_id.clone().to_string(),
                     address,
                 })
             }
             // TODO
-            ManagerRequest::GetChannel { id } => Ok(ManagerResponse::GetChannel {
-                status: "good".to_string(),
-            }),
+            ManagerRequest::GetChannel { id } => {
+                // find the id in the map
+                let channel_map = self.internal_channel_id_map.lock().await;
+                let channel_id = channel_map.get(&id);
+                match channel_id {
+                    Some(chan_id) => {
+                        // for each node in our pubkey list, check the channel status
+                        let node_list = self.internal_node_map.lock().await;
+                        let node_directory = self.admin_service.node_directory.lock().await;
+
+                        for node_pubkey in node_list.iter() {
+                            // find the node
+                            let node = match node_directory.get(node_pubkey) {
+                                Some(Some(node_handle)) => Ok(node_handle.node.clone()),
+                                _ => Err("node not found"),
+                            }
+                            .unwrap();
+
+                            // now go check channel id status
+                            let channel_req = NodeRequest::ListChannels {
+                                pagination: PaginationRequest {
+                                    page: 0,
+                                    take: 100,
+                                    query: None,
+                                },
+                            };
+                            let channel_resp = node.call(channel_req).await.unwrap();
+                            let channel_result = match channel_resp {
+                                senseicore::services::node::NodeResponse::ListChannels {
+                                    channels,
+                                    pagination,
+                                } => {
+                                    dbg!(channels.clone());
+                                    for channel in channels {
+                                        /*
+                                        dbg!(channel.channel_id.clone());
+                                        dbg!(String::from(chan_id));
+                                        dbg!(channel.channel_id.clone() == String::from(chan_id));
+                                        if channel.channel_id == String::from(chan_id) {
+                                            if channel.is_funding_locked {
+                                                return Ok(ManagerResponse::GetChannel {
+                                                    status: "good".to_string(),
+                                                });
+                                            }
+                                        }
+                                        */
+
+                                        // TODO only looking for single channel
+                                        // sense I can't come back and look for
+                                        // channel id based on temporary sensei id
+                                        if channel.is_funding_locked {
+                                            return Ok(ManagerResponse::GetChannel {
+                                                status: "good".to_string(),
+                                            });
+                                        }
+                                        continue;
+                                    }
+                                    return Ok(ManagerResponse::GetChannel {
+                                        status: "pending".to_string(),
+                                    });
+                                }
+                                _ => Some(ManagerResponse::GetChannel {
+                                    status: "pending".to_string(),
+                                }),
+                            };
+
+                            if channel_result.is_some() {
+                                return Ok(channel_result.unwrap());
+                            }
+                        }
+
+                        Ok(ManagerResponse::GetChannel {
+                            status: "pending".to_string(),
+                        })
+                    }
+                    None => Ok(ManagerResponse::GetChannel {
+                        status: "pending".to_string(),
+                    }),
+                }
+            }
             // TODO
             ManagerRequest::SendPayment { invoice } => Ok(ManagerResponse::SendPayment {
                 status: "pending".to_string(),
