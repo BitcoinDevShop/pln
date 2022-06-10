@@ -56,6 +56,7 @@ pub enum ManagerResponse {
     OpenChannel { id: String, address: String },
     GetChannel { status: String },
     SendPayment { status: String },
+    SendStatus { status: String },
     GetBalance { amt_satoshis: u64 },
     Error(Error),
 }
