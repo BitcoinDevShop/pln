@@ -25,10 +25,11 @@ use rand::{thread_rng, Rng};
 
 use lightning_background_processor::BackgroundProcessor;
 use macaroon::Macaroon;
-use senseicore::services::node::NodeRequest;
+use senseicore::services::node::{NodeRequest, OpenChannelInfo};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::atomic::Ordering;
+use std::time::Duration;
 use std::{collections::hash_map::Entry, fs, sync::Arc};
 use tokio::sync::{broadcast, Mutex};
 use tokio::task::JoinHandle;
@@ -194,33 +195,73 @@ impl ManagerService {
 
                 // Then get an address for the node
                 let node_directory = self.admin_service.node_directory.lock().await;
-                let addr = match node_directory.get(&new_node.pubkey) {
-                    Some(Some(node_handle)) => {
-                        let node_req = NodeRequest::GetUnusedAddress {};
-                        let address_resp = node_handle.node.call(node_req).await.unwrap();
-                        let address = match address_resp {
-                            senseicore::services::node::NodeResponse::GetUnusedAddress {
-                                address,
-                            } => Ok(address),
-                            _ => Err("some error"),
+                let node = match node_directory.get(&new_node.pubkey) {
+                    Some(Some(node_handle)) => Ok(node_handle.node.clone()),
+                    _ => Err("node not found"),
+                }
+                .unwrap();
+
+                let node_req = NodeRequest::GetUnusedAddress {};
+                let address_resp = node.call(node_req).await.unwrap();
+                let address = match address_resp {
+                    senseicore::services::node::NodeResponse::GetUnusedAddress { address } => {
+                        Ok(address)
+                    }
+                    _ => Err("some error"),
+                }
+                .unwrap();
+
+                // TODO make an ID for the temp channel to map to?
+
+                // Loop through waiting for funding
+                let node_spawn = node.clone();
+                tokio::spawn(async move {
+                    let mut interval = tokio::time::interval(Duration::from_secs(5));
+                    loop {
+                        interval.tick().await;
+                        let balance_req = NodeRequest::GetBalance {};
+                        let balance_resp = node_spawn.call(balance_req).await.unwrap();
+                        let balance = match balance_resp {
+                            senseicore::services::node::NodeResponse::GetBalance {
+                                balance_satoshis,
+                            } => Some(balance_satoshis),
+                            _ => None,
                         };
 
-                        address
-                    }
-                    _ => Err("Could not generate address"),
-                }
-                .unwrap(); // TODO dont unwrap, could still be spinning up
+                        if balance.is_some() && balance.unwrap() >= amt_satoshis {
+                            // Once getting funding, open channel with that node
+                            // TODO delete
+                            println!("funding complete haha");
 
-                // make an ID for the temp channel?
-                //
+                            let channel = OpenChannelInfo {
+                                node_connection_string: format!("{}@{}", pubkey, connection_string),
+                                amt_satoshis: balance.unwrap() - 1000, // TODO better fees
+                                public: false,
+                            };
+                            let channel_req = NodeRequest::OpenChannels {
+                                channels: vec![channel],
+                            };
+
+                            let channel_resp = node_spawn.call(channel_req).await.unwrap();
+                            let channel_id = match channel_resp {
+                                senseicore::services::node::NodeResponse::OpenChannels {
+                                    channels,
+                                    results,
+                                } => Some(results[0].temp_channel_id.clone().unwrap()),
+                                _ => None,
+                            };
+                            println!("channel_id: {}", channel_id.unwrap());
+                            return;
+                        }
+                        // TODO delete
+                        println!("funding not complete :(");
+                    }
+                });
+
                 // Return the response
-                //
-                // Loop through waiting for funding
-                //
-                // Once getting funding, open channel with that node
                 Ok(ManagerResponse::OpenChannel {
                     id: "123".to_string(),
-                    address: addr,
+                    address,
                 })
             }
             // TODO
