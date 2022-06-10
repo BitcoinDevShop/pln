@@ -8,21 +8,19 @@ class Balance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.ideographic,
-        children: [
-          Text(amountSats.toString(),
-              style: Theme.of(context).textTheme.headline2),
-          const Text(" sats",
-              style: TextStyle(
-                  fontFamily: "Inter",
-                  color: black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w400)),
-        ],
-      ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.ideographic,
+      children: [
+        Text(amountSats.toString(),
+            style: Theme.of(context).textTheme.headline2),
+        const Text(" sats",
+            style: TextStyle(
+                fontFamily: "Inter",
+                color: black,
+                fontSize: 24,
+                fontWeight: FontWeight.w400)),
+      ],
     );
   }
 }

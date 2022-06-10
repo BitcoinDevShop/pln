@@ -37,7 +37,7 @@ class SendNotifier extends StateNotifier<Send?> {
       final response = await plnClient.sendPayment(
         SendPaymentRequest(invoice: send.invoice),
       );
-      debugPrint('Send res: ${response}');
+      debugPrint('Send res: $response');
       state = send.copyWith(sendStatus: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');
@@ -48,7 +48,7 @@ class SendNotifier extends StateNotifier<Send?> {
     try {
       final response = await plnClient
           .sendStatus(SendStatusRequest(invoice: state?.invoice));
-      debugPrint('Send status res: ${response}');
+      debugPrint('Send status res: $response');
       state = Send(invoice: state!.invoice, sendStatus: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');

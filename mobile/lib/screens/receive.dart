@@ -3,20 +3,23 @@ import 'package:go_router/go_router.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
-import 'package:pln/widgets/textField.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ChannelFund extends ConsumerWidget {
-  const ChannelFund({Key? key}) : super(key: key);
+final Uri _url = Uri.parse('https://abytesjourney.com/lightning-privacy/');
 
-  static const address = "bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu";
+class Receive extends ConsumerWidget {
+  const Receive({Key? key}) : super(key: key);
+
+  void _launchUrl() async {
+    if (!await launchUrl(_url)) throw 'Could not launch $_url';
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
         child: Scaffold(
-            appBar: PlnAppBar(
-                title: "Fund Channel", closeAction: () => context.go("/")),
+            appBar:
+                PlnAppBar(title: "Receive", closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -24,18 +27,19 @@ class ChannelFund extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 0),
-                      QrImage(
-                          data: address,
-                          version: QrVersions.auto,
-                          // Screen width minus 40.0 for container and 48.0 for app padding
-                          // size: MediaQuery.of(context).size.width - 88.0),
-                          size: MediaQuery.of(context).size.width / 2),
+                      Expanded(
+                          child: GestureDetector(
+                        onLongPress: _launchUrl,
+                        child: Image.asset("images/no-receive.png",
+                            fit: BoxFit.cover),
+                      )),
+                      const SizedBox(height: 48),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           BlandButton(
-                              text: "Continue",
-                              onPressed: () => debugPrint("Pressed Continue")),
+                              text: "Okay...",
+                              onPressed: () => context.go("/")),
                         ],
                       )
                     ]))));

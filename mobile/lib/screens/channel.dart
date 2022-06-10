@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
-import 'package:pln/widgets/textField.dart';
+import 'package:pln/widgets/text_field.dart';
 
 class Channel extends ConsumerWidget {
   const Channel({Key? key}) : super(key: key);
@@ -30,7 +30,7 @@ class Channel extends ConsumerWidget {
                               controller: textController,
                               prompt: "Target Node",
                               iconData: Icons.memory),
-                          SizedBox(
+                          const SizedBox(
                             height: 12,
                           ),
                           BlandTextField(
