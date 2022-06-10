@@ -46,6 +46,99 @@ impl TryFrom<ManagerResponse> for GetStatusResponse {
     }
 }
 
+impl From<OpenChannelRequest> for ManagerRequest {
+    fn from(req: OpenChannelRequest) -> Self {
+        ManagerRequest::OpenChannel {
+            pubkey: req.pubkey,
+            connection_string: req.connection_string,
+            amt_satoshis: req.amt_satoshis,
+        }
+    }
+}
+
+impl From<GetChannelRequest> for ManagerRequest {
+    fn from(req: GetChannelRequest) -> Self {
+        ManagerRequest::GetChannel { id: req.id }
+    }
+}
+
+impl From<SendPaymentRequest> for ManagerRequest {
+    fn from(req: SendPaymentRequest) -> Self {
+        ManagerRequest::SendPayment {
+            invoice: req.invoice,
+        }
+    }
+}
+
+impl From<SendStatusRequest> for ManagerRequest {
+    fn from(req: SendStatusRequest) -> Self {
+        ManagerRequest::SendStatus {
+            invoice: req.invoice,
+        }
+    }
+}
+
+impl From<GetBalanceRequest> for ManagerRequest {
+    fn from(req: GetBalanceRequest) -> Self {
+        ManagerRequest::GetBalance {}
+    }
+}
+
+impl TryFrom<ManagerResponse> for OpenChannelResponse {
+    type Error = String;
+
+    fn try_from(res: ManagerResponse) -> Result<Self, Self::Error> {
+        match res {
+            ManagerResponse::OpenChannel { id, address } => Ok(Self { id, address }),
+            _ => Err("impossible".to_string()),
+        }
+    }
+}
+
+impl TryFrom<ManagerResponse> for GetChannelResponse {
+    type Error = String;
+
+    fn try_from(res: ManagerResponse) -> Result<Self, Self::Error> {
+        match res {
+            ManagerResponse::GetChannel { status } => Ok(Self { status }),
+            _ => Err("impossible".to_string()),
+        }
+    }
+}
+
+impl TryFrom<ManagerResponse> for SendPaymentResponse {
+    type Error = String;
+
+    fn try_from(res: ManagerResponse) -> Result<Self, Self::Error> {
+        match res {
+            ManagerResponse::SendPayment { status } => Ok(Self { status }),
+            _ => Err("impossible".to_string()),
+        }
+    }
+}
+
+impl TryFrom<ManagerResponse> for SendStatusResponse {
+    type Error = String;
+
+    fn try_from(res: ManagerResponse) -> Result<Self, Self::Error> {
+        match res {
+            ManagerResponse::SendStatus { status } => Ok(Self { status }),
+            _ => Err("impossible".to_string()),
+        }
+    }
+}
+
+impl TryFrom<ManagerResponse> for GetBalanceResponse {
+    type Error = String;
+
+    fn try_from(res: ManagerResponse) -> Result<Self, Self::Error> {
+        match res {
+            ManagerResponse::GetBalance { amt_satoshis } => Ok(Self { amt_satoshis }),
+            _ => Err("impossible".to_string()),
+        }
+    }
+}
+
 pub struct ManagerService {
     pub manager_service: Arc<plncore::services::manager::ManagerService>,
 }
@@ -151,11 +244,7 @@ impl Manager for ManagerService {
         &self,
         request: tonic::Request<OpenChannelRequest>,
     ) -> Result<tonic::Response<OpenChannelResponse>, tonic::Status> {
-        let request = ManagerRequest::OpenChannel {
-            pubkey: todo!(),
-            connection_string: todo!(),
-            amt_satoshis: todo!(),
-        };
+        let request: ManagerRequest = request.into_inner().into();
         match self.manager_service.call(request).await {
             Ok(response) => {
                 let response: Result<OpenChannelResponse, String> = response.try_into();
@@ -169,9 +258,9 @@ impl Manager for ManagerService {
 
     async fn get_channel(
         &self,
-        _request: tonic::Request<GetChannelRequest>,
+        request: tonic::Request<GetChannelRequest>,
     ) -> Result<tonic::Response<GetChannelResponse>, tonic::Status> {
-        let request = ManagerRequest::GetChannel { id: todo!() };
+        let request: ManagerRequest = request.into_inner().into();
         match self.manager_service.call(request).await {
             Ok(response) => {
                 let response: Result<GetChannelResponse, String> = response.try_into();
@@ -185,9 +274,9 @@ impl Manager for ManagerService {
 
     async fn send_payment(
         &self,
-        _request: tonic::Request<SendPaymentRequest>,
+        request: tonic::Request<SendPaymentRequest>,
     ) -> Result<tonic::Response<SendPaymentResponse>, tonic::Status> {
-        let request = ManagerRequest::SendPaymentRequest {};
+        let request: ManagerRequest = request.into_inner().into();
         match self.manager_service.call(request).await {
             Ok(response) => {
                 let response: Result<SendPaymentResponse, String> = response.try_into();
@@ -201,9 +290,9 @@ impl Manager for ManagerService {
 
     async fn send_status(
         &self,
-        _request: tonic::Request<SendStatusRequest>,
+        request: tonic::Request<SendStatusRequest>,
     ) -> Result<tonic::Response<SendStatusResponse>, tonic::Status> {
-        let request = ManagerRequest::SendStatusRequest {};
+        let request: ManagerRequest = request.into_inner().into();
         match self.manager_service.call(request).await {
             Ok(response) => {
                 let response: Result<SendStatusResponse, String> = response.try_into();
@@ -217,9 +306,9 @@ impl Manager for ManagerService {
 
     async fn get_balance(
         &self,
-        _request: tonic::Request<GetBalanceRequest>,
+        request: tonic::Request<GetBalanceRequest>,
     ) -> Result<tonic::Response<GetBalanceResponse>, tonic::Status> {
-        let request = ManagerRequest::GetBalanceRequest {};
+        let request: ManagerRequest = request.into_inner().into();
         match self.manager_service.call(request).await {
             Ok(response) => {
                 let response: Result<GetBalanceResponse, String> = response.try_into();
