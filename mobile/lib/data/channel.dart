@@ -80,7 +80,7 @@ class ChannelNotifier extends StateNotifier<Channel?> {
   startPolling() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(milliseconds: 2000), (_) async {
-      if (state?.status != "bad") {
+      if (state?.status != "good") {
         await checkChannelStatus();
       } else {
         _timer?.cancel();

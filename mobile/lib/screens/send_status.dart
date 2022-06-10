@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pln/data/send.dart';
@@ -7,24 +5,24 @@ import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/key_value.dart';
-import "package:pln/utility/capitalize.dart";
 
-final sendStatusStreamProvider = StreamProvider<String?>((ref) {
+final sendStatusStreamProvider = StreamProvider.autoDispose<String?>((ref) {
   Stream<String?> getStatus() async* {
-    while (true) {
-      await Future.delayed(Duration(seconds: 1));
+    var shouldPoll = true;
+    while (shouldPoll) {
+      await Future.delayed(const Duration(seconds: 1));
       await ref.read(sendProvider.notifier).checkPaymentStatus();
-      yield ref.read(sendProvider)?.sendStatus;
+      final status = ref.read(sendProvider)?.sendStatus;
+      if (status == "good") {
+        shouldPoll = false;
+        yield status;
+      } else {
+        yield status;
+      }
     }
   }
 
   return getStatus();
-  // while (true) {
-  //   await Future.delayed(Duration(seconds: 1));
-  //   yield random.nextDouble();
-  // }
-
-  // ref.watch(sendProvider).asyncMap((value) => value ?? ""),
 });
 
 class SendStatus extends ConsumerWidget {
@@ -36,10 +34,16 @@ class SendStatus extends ConsumerWidget {
     final send = ref.watch(sendProvider);
     final sendNotifier = ref.read(sendProvider.notifier);
 
+    _close() {
+      // sendNotifier.clear();
+      context.go("/");
+    }
+
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "Sending...", closeAction: () => context.go("/")),
+                title: send?.sendStatus == "good" ? "Sent!" : "Sending...",
+                closeAction: _close),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -51,23 +55,27 @@ class SendStatus extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           KeyValue(
-                              k: send?.sendStatus?.capitalize() ?? "Status",
-                              v: "..."),
-                          statusProvider.when(
-                              data: (data) => Text(data ?? "nope"),
-                              loading: () => const CircularProgressIndicator(),
-                              error: (err, _) => Text(err.toString()))
+                            k: "Send Status",
+                            vw: statusProvider.when(
+                                data: (data) => Text(
+                                    data ?? "no status something went wrong?"),
+                                loading: () => const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                error: (err, _) => Text(err.toString())),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // BlandButton(
-                          //   text: "Poll",
-                          //   onPressed: _checkPayment,
-                          //   // onPressed: _sendPayment,
-                          // )
+                          BlandButton(
+                            text:
+                                send?.sendStatus == "good" ? "Nice" : "Give Up",
+                            onPressed: _close,
+                          )
                         ],
                       )
                     ]))));

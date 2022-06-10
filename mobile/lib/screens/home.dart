@@ -7,24 +7,37 @@ import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/balance.dart';
 import 'package:pln/widgets/button.dart';
 
-final balanceFutureProvider = FutureProvider<int>(
-  (ref) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    final response =
-        await plnClient.getBalance(GetBalanceRequest()); // our future
-    return response.amtSatoshis.toInt(); //returns a list of all the hospitals
-  },
-);
+// final balanceFutureProvider = FutureProvider<int>(
+//   (ref) async {
+//     await Future.delayed(const Duration(milliseconds: 200));
+//     final response =
+//         await plnClient.getBalance(GetBalanceRequest()); // our future
+//     return response.amtSatoshis.toInt(); //returns a list of all the hospitals
+//   },
+// );
+
+final balanceStreamProvider = StreamProvider.autoDispose<int>((ref) {
+  Stream<int> getStatus() async* {
+    while (true) {
+      await Future.delayed(const Duration(seconds: 1));
+      final response = await plnClient.getBalance(GetBalanceRequest());
+
+      yield response.amtSatoshis.toInt();
+    }
+  }
+
+  return getStatus();
+});
 
 class Home extends ConsumerWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<int> state = ref.watch(balanceFutureProvider);
+    AsyncValue<int> state = ref.watch(balanceStreamProvider);
 
     _refresh() async {
-      ref.refresh(balanceFutureProvider);
+      ref.refresh(balanceStreamProvider);
     }
 
     return SafeArea(
@@ -42,7 +55,7 @@ class Home extends ConsumerWidget {
                       state.when(
                           data: (balance) => GestureDetector(
                               onTap: _refresh, child: Balance(balance)),
-                          loading: () => const Text("..."),
+                          loading: () => const CircularProgressIndicator(),
                           error: (err, _) => Text(err.toString())),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

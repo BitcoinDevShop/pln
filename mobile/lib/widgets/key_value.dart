@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 class KeyValue extends StatelessWidget {
   final String k;
-  final String v;
+  final String? v;
+  final Widget? vw;
 
-  const KeyValue({Key? key, required this.k, required this.v})
+  const KeyValue({Key? key, required this.k, this.v, this.vw})
       : super(key: key);
 
   @override
@@ -16,7 +17,8 @@ class KeyValue extends StatelessWidget {
           k,
           style: Theme.of(context).textTheme.headline6,
         ),
-        Text(v),
+        const SizedBox(height: 4),
+        vw != null ? vw! : Text(v!),
       ],
     );
   }

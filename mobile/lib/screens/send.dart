@@ -17,7 +17,7 @@ class SendScreen extends ConsumerWidget {
     _create() async {
       try {
         await sendNotifier
-            .createSendState(Send(invoice: invoiceTextController.text))
+            .createSendFromInvoice(invoiceTextController.text)
             .then((_) {
           debugPrint("creating... ${invoiceTextController.text}");
           context.go("/send/confirm");
