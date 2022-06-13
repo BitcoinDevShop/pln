@@ -1,9 +1,10 @@
-# pLN - privacy is the only option
+# pLN - privacy is the only option 
 
 * Spin up a new node for every channel open
 * Fund channels with an external wallet, and no change!
 * Sending
 * No receive lol
+* DO NOT USE THIS ISN'T EVEN ALPHA YET
 
 Here's our hackathon presentation: [slides](https://github.com/BitcoinDevShop/pln/files/8893172/pln.pdf) and [video](https://www.youtube.com/watch?v=gaQ0m1AMpq0?start=6454)
 
