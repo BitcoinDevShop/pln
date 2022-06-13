@@ -5,7 +5,7 @@
 * Sending
 * No receive lol
 
-Here's our hackathon presentation: [pln.pdf](https://github.com/BitcoinDevShop/pln/files/8893172/pln.pdf)
+Here's our hackathon presentation: [slides](https://github.com/BitcoinDevShop/pln/files/8893172/pln.pdf) and [video](https://www.youtube.com/watch?v=gaQ0m1AMpq0?start=6454)
 
 ## Architecture
 
