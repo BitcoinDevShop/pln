@@ -1,4 +1,19 @@
-# pLN
+# pLN - privacy is the only option
+
+* Spin up a new node for every channel open
+* Fund channels with an external wallet, and no change!
+* Sending
+* No receive lol
+
+Here's our hackathon presentation: [pln.pdf](https://github.com/BitcoinDevShop/pln/files/8893172/pln.pdf)
+
+## Architecture
+
+<img width="393" alt="Screen Shot 2022-06-13 at 10 11 12 AM" src="https://user-images.githubusercontent.com/543668/173408578-6b0e9f41-6ea6-4f28-aa91-7f1d9a565357.png">
+
+## How Channel Opens Work
+
+<img width="702" alt="Screen Shot 2022-06-13 at 10 12 12 AM" src="https://user-images.githubusercontent.com/543668/173408613-aebf32e3-d751-4c50-80c9-1125b1fc61ec.png">
 
 ## Running
 
@@ -47,24 +62,24 @@ bitcoin-cli -named sendtoaddress address="bcrt1qmjwu997paw5pec8kp4t2qzuktw5anqyf
 - [x] Tony: stub rest of grpc api
 - [x] Paul: import rest of grpc api
 - [x] Tony: fake logic for grpc api
-- [ ] Tony: implement apis
-- [ ] API: open_channel
-- [ ] API: channel_status
-- [ ] API: create_send
-- [ ] API: send_status
-- [ ] API: get_balance
-- [ ] Paul: wire up frontend to logic
+- [x] Tony: implement apis
+- [x] API: open_channel
+- [x] API: channel_status
+- [x] API: create_send
+- [x] API: send_status
+- [x] API: get_balance
+- [x] Paul: wire up frontend to logic
 - [x] LOGIC: open channel
 - [x] LOGIC: poll channel
 - [x] LOGIC: create send
 - [x] LOGIC: poll send
 - [x] LOGIC: poll balance
 - [ ] Paul + Tony: make sure everything actually works
-- [ ] Paul + Tony: make a presentation
+- [x] Paul + Tony: make a presentation
 
 ## Stretch Todo
 
-- [ ] Tony: decode invoices
+- [x] Paul: decode invoices
 - [ ] Tony: subscribe apis
 - [ ] Paul: hook up subscribe apis
 - [ ] Tony: update sensei to ldk v107
@@ -75,10 +90,4 @@ bitcoin-cli -named sendtoaddress address="bcrt1qmjwu997paw5pec8kp4t2qzuktw5anqyf
 - [ ] Paul: Make it prettier
 - [ ] Tony: multi-node payments (virtual channels?)
 
-## Paul mini todo
 
-another lightning node on nigiri
-get its connection string
-paste connection string in create channel
-use nigiri to send money to bitcoin address in fund channel
-it should create the channel
