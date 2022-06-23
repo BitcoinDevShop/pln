@@ -16,7 +16,7 @@ use super::pln::{
     SendPaymentResponse, SendStatusRequest, SendStatusResponse,
 };
 use plncore::services::manager::{ManagerRequest, ManagerResponse};
-use tonic::{metadata::MetadataMap, Response, Status};
+use tonic::Response;
 
 /*
 impl From<entity::access_token::Model> for Token {
@@ -79,7 +79,7 @@ impl From<SendStatusRequest> for ManagerRequest {
 }
 
 impl From<GetBalanceRequest> for ManagerRequest {
-    fn from(req: GetBalanceRequest) -> Self {
+    fn from(_req: GetBalanceRequest) -> Self {
         ManagerRequest::GetBalance {}
     }
 }

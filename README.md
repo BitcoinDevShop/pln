@@ -30,7 +30,7 @@ Paul
 cargo run  -- --development-mode=true --network=regtest --bitcoind-rpc-host=localhost --bitcoind-rpc-port=18443 --bitcoind-rpc-username=admin1 --bitcoind-rpc-password=123 --data-dir=./.data
 ```
 
-The GRPC should run on `5401`, but maybe 3001 lol
+The GRPC should run on `5401`
 
 ## regen protobuf stuff for flutter:
 

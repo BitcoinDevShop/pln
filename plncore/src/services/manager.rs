@@ -16,25 +16,16 @@ use crate::network_graph::SenseiNetworkGraph;
 use crate::{config::SenseiConfig, hex_utils, node::LightningNode, version};
 */
 
-use entity::node::{self, NodeRole};
-use entity::sea_orm::{ActiveModelTrait, ActiveValue, EntityTrait};
-use entity::{access_token, seconds_since_epoch};
-use futures::stream::{self, StreamExt};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 
-use lightning_background_processor::BackgroundProcessor;
-use macaroon::Macaroon;
 use senseicore::services::node::{NodeRequest, OpenChannelInfo};
 use senseicore::services::PaginationRequest;
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet, VecDeque};
-use std::sync::atomic::Ordering;
+use serde::Serialize;
+use std::collections::HashMap;
+use std::sync::Arc;
 use std::time::Duration;
-use std::{collections::hash_map::Entry, fs, sync::Arc};
-use tokio::sync::{broadcast, Mutex};
-use tokio::task::JoinHandle;
-use uuid::Uuid;
+use tokio::sync::Mutex;
 
 use senseicore::services::admin::{AdminRequest, AdminResponse, AdminService};
 
@@ -180,10 +171,10 @@ impl ManagerService {
                 let new_node = match create_node_resp {
                     AdminResponse::CreateNode {
                         pubkey,
-                        macaroon,
-                        listen_addr,
-                        listen_port,
-                        id,
+                        macaroon: _,
+                        listen_addr: _,
+                        listen_port: _,
+                        id: _,
                     } => {
                         // get the node back from the db
                         let db_node = self
@@ -262,7 +253,7 @@ impl ManagerService {
                             let channel_resp = node_spawn.call(channel_req).await.unwrap();
                             let channel_id = match channel_resp {
                                 senseicore::services::node::NodeResponse::OpenChannels {
-                                    channels,
+                                    channels: _,
                                     results,
                                 } => Some(results[0].temp_channel_id.clone().unwrap()),
                                 _ => None,
@@ -292,80 +283,79 @@ impl ManagerService {
                 // find the id in the map
                 let channel_map = self.internal_channel_id_map.lock().await;
                 let channel_id = channel_map.get(&id);
-                match channel_id {
-                    Some(chan_id) => {
-                        // for each node in our pubkey list, check the channel status
-                        let node_list = self.internal_node_map.lock().await;
-                        let node_directory = self.admin_service.node_directory.lock().await;
+                if let Some(_chan_id) = channel_id {
+                    // for each node in our pubkey list, check the channel status
+                    let node_list = self.internal_node_map.lock().await;
+                    let node_directory = self.admin_service.node_directory.lock().await;
 
-                        for node_pubkey in node_list.iter() {
-                            // find the node
-                            let node = match node_directory.get(node_pubkey) {
-                                Some(Some(node_handle)) => Ok(node_handle.node.clone()),
-                                _ => Err("node not found"),
-                            }
-                            .unwrap();
+                    for node_pubkey in node_list.iter() {
+                        // find the node
+                        let node = match node_directory.get(node_pubkey) {
+                            Some(Some(node_handle)) => Ok(node_handle.node.clone()),
+                            _ => Err("node not found"),
+                        }
+                        .unwrap();
 
-                            // now go check channel id status
-                            let channel_req = NodeRequest::ListChannels {
-                                pagination: PaginationRequest {
-                                    page: 0,
-                                    take: 100,
-                                    query: None,
-                                },
-                            };
-                            let channel_resp = node.call(channel_req).await.unwrap();
-                            let channel_result = match channel_resp {
-                                senseicore::services::node::NodeResponse::ListChannels {
-                                    channels,
-                                    pagination,
-                                } => {
-                                    dbg!(channels.clone());
-                                    for channel in channels {
-                                        /*
-                                        dbg!(channel.channel_id.clone());
-                                        dbg!(String::from(chan_id));
-                                        dbg!(channel.channel_id.clone() == String::from(chan_id));
-                                        if channel.channel_id == String::from(chan_id) {
-                                            if channel.is_funding_locked {
-                                                return Ok(ManagerResponse::GetChannel {
-                                                    status: "good".to_string(),
-                                                });
-                                            }
-                                        }
-                                        */
-
-                                        // TODO only looking for single channel
-                                        // sense I can't come back and look for
-                                        // channel id based on temporary sensei id
+                        // now go check channel id status
+                        let channel_req = NodeRequest::ListChannels {
+                            pagination: PaginationRequest {
+                                page: 0,
+                                take: 100,
+                                query: None,
+                            },
+                        };
+                        let channel_resp = node.call(channel_req).await.unwrap();
+                        let channel_result = match channel_resp {
+                            senseicore::services::node::NodeResponse::ListChannels {
+                                channels,
+                                pagination: _,
+                            } => {
+                                dbg!(channels.clone());
+                                for channel in channels {
+                                    /*
+                                    dbg!(channel.channel_id.clone());
+                                    dbg!(String::from(chan_id));
+                                    dbg!(channel.channel_id.clone() == String::from(chan_id));
+                                    if channel.channel_id == String::from(chan_id) {
                                         if channel.is_funding_locked {
                                             return Ok(ManagerResponse::GetChannel {
                                                 status: "good".to_string(),
                                             });
                                         }
-                                        continue;
                                     }
-                                    return Ok(ManagerResponse::GetChannel {
-                                        status: "pending".to_string(),
-                                    });
+                                    */
+
+                                    // TODO only looking for single channel
+                                    // sense I can't come back and look for
+                                    // channel id based on temporary sensei id
+                                    if channel.is_funding_locked {
+                                        return Ok(ManagerResponse::GetChannel {
+                                            status: "good".to_string(),
+                                        });
+                                    }
+                                    continue;
                                 }
-                                _ => Some(ManagerResponse::GetChannel {
+                                return Ok(ManagerResponse::GetChannel {
                                     status: "pending".to_string(),
-                                }),
-                            };
-
-                            if channel_result.is_some() {
-                                return Ok(channel_result.unwrap());
+                                });
                             }
-                        }
+                            _ => Some(ManagerResponse::GetChannel {
+                                status: "pending".to_string(),
+                            }),
+                        };
 
-                        Ok(ManagerResponse::GetChannel {
-                            status: "pending".to_string(),
-                        })
+                        if channel_result.is_some() {
+                            return Ok(channel_result.unwrap());
+                        }
                     }
-                    None => Ok(ManagerResponse::GetChannel {
+
+                    Ok(ManagerResponse::GetChannel {
                         status: "pending".to_string(),
-                    }),
+                    })
+                } else {
+                    Ok(ManagerResponse::GetChannel {
+                        status: "pending".to_string(),
+                    })
                 }
             }
             // TODO
@@ -402,7 +392,7 @@ impl ManagerService {
                 })
             }
             // TODO
-            ManagerRequest::SendStatus { invoice } => Ok(ManagerResponse::SendStatus {
+            ManagerRequest::SendStatus { invoice: _ } => Ok(ManagerResponse::SendStatus {
                 status: "good".to_string(),
             }),
             // TODO
