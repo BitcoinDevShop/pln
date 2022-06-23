@@ -11,6 +11,8 @@ mod grpc;
 //mod http;
 mod hybrid;
 
+use anyhow::{Context, Result};
+
 use senseicore::{
     chain::{bitcoind_client::BitcoindClient, manager::SenseiChainManager},
     config::SenseiConfig,
@@ -19,37 +21,16 @@ use senseicore::{
     services::admin::{AdminRequest, AdminResponse, AdminService},
 };
 
-// use plncore::services::admin::{AdminRequest, AdminResponse, AdminService};
 use plncore::services::manager::{ManagerRequest, ManagerResponse, ManagerService};
 
 use entity::sea_orm::{self, ConnectOptions};
 use migration::{Migrator, MigratorTrait};
 use sea_orm::Database;
 
-//use crate::http::admin::add_routes as add_admin_routes;
-//use crate::http::node::add_routes as add_node_routes;
-
-use ::http::{
-    header::{self, ACCEPT, AUTHORIZATION, CONTENT_TYPE, COOKIE},
-    Method, Uri,
-};
-use axum::{
-    body::{boxed, Full},
-    extract::Extension,
-    handler::Handler,
-    http::StatusCode,
-    response::{Html, IntoResponse, Response},
-    routing::get,
-    Router,
-};
+use axum::{extract::Extension, Router};
 use clap::Parser;
 
-use rust_embed::RustEmbed;
-
 use grpc::manager::{ManagerServer, ManagerService as GrpcManagerService};
-/*
-use grpc::node::{NodeServer, NodeService as GrpcNodeService};
-*/
 use std::net::SocketAddr;
 use std::time::Duration;
 use tower_cookies::CookieManagerLayer;
@@ -57,7 +38,6 @@ use tower_cookies::CookieManagerLayer;
 use std::fs;
 use std::sync::Arc;
 use tonic::transport::Server;
-use tower_http::cors::{CorsLayer, Origin};
 
 use tokio::runtime::Builder;
 use tokio::sync::broadcast;
@@ -95,17 +75,19 @@ struct SenseiArgs {
 }
 
 pub type ManagerRequestResponse = (ManagerRequest, Sender<ManagerResponse>);
-fn main() {
+fn main() -> Result<()> {
     env_logger::init();
     macaroon::initialize().expect("failed to initialize macaroons");
     let args = SenseiArgs::parse();
 
-    let sensei_dir = match args.data_dir {
-        Some(dir) => dir,
-        None => {
-            let home_dir = dirs::home_dir().unwrap_or_else(|| ".".into());
-            format!("{}/.sensei", home_dir.to_str().unwrap())
-        }
+    let sensei_dir = if let Some(dir) = args.data_dir {
+        dir
+    } else {
+        let home_dir = dirs::home_dir().unwrap_or_else(|| ".".into());
+        format!(
+            "{}/.sensei",
+            home_dir.to_str().context("invalid home dir string")?
+        )
     };
 
     fs::create_dir_all(&sensei_dir).expect("failed to create data directory");
@@ -114,11 +96,15 @@ fn main() {
     let mut root_config = SenseiConfig::from_file(root_config_path, None);
 
     if let Some(network) = args.network {
-        root_config.set_network(network.parse::<bitcoin::Network>().unwrap());
+        root_config.set_network(
+            network
+                .parse::<bitcoin::Network>()
+                .context("invalid network arg")?,
+        );
     }
 
     fs::create_dir_all(format!("{}/{}", sensei_dir, root_config.network))
-        .expect("failed to create network directory");
+        .context("failed to create network directory")?;
 
     let network_config_path = format!("{}/{}/config.json", sensei_dir, root_config.network);
     let mut config = SenseiConfig::from_file(network_config_path, Some(root_config));
@@ -161,16 +147,15 @@ fn main() {
         .worker_threads(20)
         .thread_name("persistence")
         .enable_all()
-        .build()
-        .unwrap();
+        .build()?;
+
     let persistence_runtime_handle = persistence_runtime.handle().clone();
 
     let sensei_runtime = Builder::new_multi_thread()
         .worker_threads(20)
         .thread_name("sensei")
         .enable_all()
-        .build()
-        .unwrap();
+        .build()?;
 
     sensei_runtime.block_on(async move {
         let (event_sender, _event_receiver): (
@@ -228,60 +213,56 @@ fn main() {
         );
 
         // get a root node if already created
-        let get_node_req = match admin_service
+        let get_node_req = if let Ok(resp) = admin_service
             .call(AdminRequest::StartAdmin {
                 passphrase: String::from("password"),
             })
             .await
         {
-            Ok(resp) => {
-                let found_node = match resp {
-                    AdminResponse::StartAdmin {
-                        pubkey,
-                        macaroon,
-                        token,
-                    } => {
-                        let directory = admin_service.node_directory.lock().await;
-                        let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
-                        Some(handle.node.clone())
-                    }
-                    _ => None,
-                };
-                found_node
-            }
-            Err(_) => None,
+            let found_node = if let AdminResponse::StartAdmin {
+                pubkey,
+                macaroon: _,
+                token: _,
+            } = resp
+            {
+                let directory = admin_service.node_directory.lock().await;
+                let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
+                Some(handle.node.clone())
+            } else {
+                None
+            };
+            found_node
+        } else {
+            None
         };
 
         // Create a node if we do not have one already
-        let root_node = match get_node_req {
-            Some(node) => node,
-            None => {
-                let new_node = match admin_service
-                    .call(AdminRequest::CreateAdmin {
-                        username: String::from("root"),
-                        alias: String::from("root"),
-                        passphrase: String::from("password"),
-                        start: true,
-                    })
-                    .await
-                    .unwrap()
-                {
-                    AdminResponse::CreateAdmin {
-                        pubkey,
-                        macaroon,
-                        id,
-                        token,
-                        role,
-                    } => {
-                        let directory = admin_service.node_directory.lock().await;
-                        let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
-                        Some(handle.node.clone())
-                    }
-                    _ => None,
-                }
-                .unwrap();
-                new_node
+        let root_node = if let Some(node) = get_node_req {
+            node
+        } else {
+            let new_node = if let Ok(AdminResponse::CreateAdmin {
+                pubkey,
+                macaroon: _,
+                id: _,
+                token: _,
+                role: _,
+            }) = admin_service
+                .call(AdminRequest::CreateAdmin {
+                    username: String::from("root"),
+                    alias: String::from("root"),
+                    passphrase: String::from("password"),
+                    start: true,
+                })
+                .await
+            {
+                let directory = admin_service.node_directory.lock().await;
+                let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
+                Some(handle.node.clone())
+            } else {
+                None
             }
+            .unwrap();
+            new_node
         };
 
         let manager_service =
@@ -301,81 +282,7 @@ fn main() {
         // got a node!
         println!("node: {}, running: {}", root_node.get_pubkey(), status);
 
-        // now lets create a new node and address
-        //TODO delete this
-        /*
-        let new_chan_res = manager_service
-            .clone()
-            .call(ManagerRequest::OpenChannel {
-                pubkey: "03eaf1a5f8f1b7a4aca2626ff869f73455c77d86c89807f9c260e2dc16bd4bdbd5"
-                    .to_string(),
-                connection_string: "127.0.0.1:9734".to_string(),
-                amt_satoshis: 20_000,
-            })
-            .await
-            .unwrap(); // TODO do not unwrap
-        let channel_id = match new_chan_res {
-            ManagerResponse::OpenChannel { id, address } => {
-                println!("address: {}", address);
-                id
-            }
-            _ => "no".to_string(),
-        };
-
-        let channel_id_copy = channel_id.clone();
-        let manager_service_copy = manager_service.clone();
-        tokio::spawn(async move {
-            let mut interval = tokio::time::interval(Duration::from_secs(5));
-            loop {
-                interval.tick().await;
-                println!("checking channel id: {}", channel_id_copy);
-
-                let new_chan_status_res = manager_service_copy
-                    .clone()
-                    .call(ManagerRequest::GetChannel {
-                        id: channel_id_copy.clone(),
-                    })
-                    .await
-                    .unwrap(); // TODO do not unwrap
-
-                let chan_status = match new_chan_status_res {
-                    ManagerResponse::GetChannel { status } => status,
-                    _ => "bad".to_string(),
-                };
-                println!("channel_status: {}", chan_status);
-            }
-        });
-        */
-
         let router = Router::new();
-        //.route("/admin/*path", static_handler.into_service()) // TODO none of these routes
-        //.fallback(get(not_found));
-
-        /*
-        let router = add_admin_routes(router);
-        let router = add_node_routes(router);
-
-        let router = match args.development_mode {
-            Some(_development_mode) => router.layer(
-                CorsLayer::new()
-                    .allow_headers(vec![AUTHORIZATION, ACCEPT, COOKIE, CONTENT_TYPE])
-                    .allow_credentials(true)
-                    .allow_origin(Origin::list(vec![
-                        "http://localhost:3001".parse().unwrap(),
-                        "http://localhost:5401".parse().unwrap(),
-                    ]))
-                    .allow_methods(vec![
-                        Method::GET,
-                        Method::POST,
-                        Method::OPTIONS,
-                        Method::DELETE,
-                        Method::PUT,
-                        Method::PATCH,
-                    ]),
-            ),
-            None => router,
-        };
-        */
 
         let port = match args.development_mode {
             Some(_) => String::from("3001"),
@@ -409,58 +316,6 @@ fn main() {
             eprintln!("server error: {}", e);
         }
     });
+
+    Ok(())
 }
-
-// We use a wildcard matcher ("/static/*file") to match against everything
-// within our defined assets directory. This is the directory on our Asset
-// struct below, where folder = "examples/public/".
-/*
-async fn static_handler(uri: Uri) -> impl IntoResponse {
-    let mut path = uri.path().trim_start_matches('/').to_string();
-
-    if path.starts_with("admin/static/") {
-        path = path.replace("admin/static/", "static/");
-    } else {
-        path = String::from("index.html");
-    }
-
-    StaticFile(path)
-}
-
-// Finally, we use a fallback route for anything that didn't match.
-async fn not_found() -> Html<&'static str> {
-    Html("<h1>404</h1><p>Not Found</p>")
-}
-*/
-
-/*
-#[derive(RustEmbed)]
-#[folder = "web-admin/build/"]
-struct Asset;
-
-pub struct StaticFile<T>(pub T);
-
-impl<T> IntoResponse for StaticFile<T>
-where
-    T: Into<String>,
-{
-    fn into_response(self) -> Response {
-        let path = self.0.into();
-
-        match Asset::get(path.as_str()) {
-            Some(content) => {
-                let body = boxed(Full::from(content.data));
-                let mime = mime_guess::from_path(path).first_or_octet_stream();
-                Response::builder()
-                    .header(header::CONTENT_TYPE, mime.as_ref())
-                    .body(body)
-                    .unwrap()
-            }
-            None => Response::builder()
-                .status(StatusCode::NOT_FOUND)
-                .body(boxed(Full::from("404")))
-                .unwrap(),
-        }
-    }
-}
-*/

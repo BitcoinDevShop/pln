@@ -54,6 +54,7 @@ entity = { path = "entity" }
 migration = { path = "migration" }
 # senseicore = { path = "senseicore" }
 plncore = { path = "plncore" }
+anyhow = "1.0.58"
 
 [build-dependencies]
 tonic-build = "0.6"
