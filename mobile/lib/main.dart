@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pln/data/prefs.dart';
 import 'package:pln/router.dart';
 import 'package:pln/theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+late SharedPreferences prefs;
+
+final prefProvider = createPrefProvider(
+  prefs: (_) => prefs,
+);
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  prefs = await SharedPreferences.getInstance();
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

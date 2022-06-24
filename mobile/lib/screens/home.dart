@@ -7,22 +7,32 @@ import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/balance.dart';
 import 'package:pln/widgets/button.dart';
 
-// final balanceFutureProvider = FutureProvider<int>(
-//   (ref) async {
-//     await Future.delayed(const Duration(milliseconds: 200));
-//     final response =
-//         await plnClient.getBalance(GetBalanceRequest()); // our future
-//     return response.amtSatoshis.toInt(); //returns a list of all the hospitals
-//   },
-// );
-
-final balanceStreamProvider = StreamProvider.autoDispose<int>((ref) {
-  Stream<int> getStatus() async* {
+final balanceStreamProvider = StreamProvider.autoDispose<int?>((ref) {
+  Stream<int?> getStatus() async* {
     while (true) {
-      await Future.delayed(const Duration(seconds: 1));
-      final response = await plnClient.getBalance(GetBalanceRequest());
+      try {
+        final plnClient = ref.read(plnClientProvider);
+        if (plnClient == null) {
+          final plnClientNotifier = ref.read(plnClientProvider.notifier);
+          await plnClientNotifier.restartClient();
+          final plnClient = ref.read(plnClientProvider);
+          if (plnClient == null) {
+            throw ("no client");
+          }
+          await Future.delayed(const Duration(seconds: 5));
+          final response = await plnClient.getBalance(GetBalanceRequest());
+          yield response.amtSatoshis.toInt();
+        } else {
+          await Future.delayed(const Duration(seconds: 1));
+          final response = await plnClient.getBalance(GetBalanceRequest());
+          yield response.amtSatoshis.toInt();
+        }
+      } catch (e) {
+        debugPrint("error: ${e.toString()}");
+        yield null;
+        // yield null;
 
-      yield response.amtSatoshis.toInt();
+      }
     }
   }
 
@@ -34,7 +44,7 @@ class Home extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<int> state = ref.watch(balanceStreamProvider);
+    AsyncValue<int?> state = ref.watch(balanceStreamProvider);
 
     _refresh() async {
       ref.refresh(balanceStreamProvider);
@@ -54,25 +64,54 @@ class Home extends ConsumerWidget {
                     children: [
                       state.when(
                           data: (balance) => GestureDetector(
-                              onTap: _refresh, child: Balance(balance)),
+                              onTap: _refresh,
+                              child: balance != null
+                                  ? Balance(balance)
+                                  : const Text("no connection")),
                           loading: () => const CircularProgressIndicator(),
                           error: (err, _) => Text(err.toString())),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlandButton(
-                              text: "Send",
-                              onPressed: () => context.go("/send")),
-                          const SizedBox(height: 12),
-                          BlandButton(
-                              text: "Receive",
-                              onPressed: () => context.go("/receive")),
-                          const SizedBox(height: 12),
-                          BlandButton(
-                            text: "Open Channel",
-                            onPressed: () => context.go("/channel"),
-                          )
-                        ],
+                      state.when(
+                        data: (balance) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            BlandButton(
+                                disabled: balance == null,
+                                text: "Send",
+                                onPressed: () => context.go("/send")),
+                            const SizedBox(height: 12),
+                            BlandButton(
+                                disabled: balance == null,
+                                text: "Receive",
+                                onPressed: () => context.go("/receive")),
+                            const SizedBox(height: 12),
+                            BlandButton(
+                              disabled: balance == null,
+                              text: "Open Channel",
+                              onPressed: () => context.go("/channel"),
+                            )
+                          ],
+                        ),
+                        loading: () => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            BlandButton(
+                                disabled: true,
+                                text: "Send",
+                                onPressed: () => context.go("/send")),
+                            const SizedBox(height: 12),
+                            BlandButton(
+                                disabled: true,
+                                text: "Receive",
+                                onPressed: () => context.go("/receive")),
+                            const SizedBox(height: 12),
+                            BlandButton(
+                              disabled: true,
+                              text: "Open Channel",
+                              onPressed: () => context.go("/channel"),
+                            )
+                          ],
+                        ),
+                        error: (err, _) => const SizedBox(height: 0),
                       )
                     ]))));
   }

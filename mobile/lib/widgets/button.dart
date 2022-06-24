@@ -5,7 +5,9 @@ import '../constants.dart';
 class BlandButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String text;
-  const BlandButton({Key? key, required this.text, this.onPressed})
+  final bool disabled;
+  const BlandButton(
+      {Key? key, required this.text, this.onPressed, this.disabled = false})
       : super(key: key);
 
   @override
@@ -14,6 +16,7 @@ class BlandButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           textStyle: Theme.of(context).textTheme.headline3,
+
           elevation: 5,
           onPrimary: black,
           // textStyle: const TextStyle(color: black),
@@ -22,7 +25,8 @@ class BlandButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(0),
           ),
         ),
-        onPressed: onPressed ?? () => debugPrint('unimplemented'),
+        onPressed:
+            disabled ? null : onPressed ?? () => debugPrint('unimplemented'),
         child: Text(text));
   }
 }
