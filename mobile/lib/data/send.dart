@@ -39,19 +39,21 @@ int btcToSats(btc) {
 }
 
 class SendNotifier extends StateNotifier<Send?> {
-  SendNotifier() : super(null);
+  SendNotifier(this.ref) : super(null);
+
+  final Ref ref;
 
   createSendFromInvoice(String invoice) async {
     final req = Bolt11PaymentRequest(invoice);
     debugPrint("amount: ${(req.amount.toDouble() * 100000000).toInt()}");
 
     var description = "";
-    req.tags.forEach((TaggedField t) {
-      print("${t.type}: ${t.data}");
+    for (var t in req.tags) {
+      debugPrint("${t.type}: ${t.data}");
       if (t.type == "description") {
         description = t.data;
       }
-    });
+    }
     state = Send(
         invoice: invoice,
         amountSats: btcToSats(req.amount),
@@ -64,6 +66,7 @@ class SendNotifier extends StateNotifier<Send?> {
   }
 
   pay() async {
+    final plnClient = ref.read(plnClientProvider)!;
     try {
       debugPrint("paying...");
       final response = await plnClient.sendPayment(
@@ -77,6 +80,7 @@ class SendNotifier extends StateNotifier<Send?> {
   }
 
   checkPaymentStatus() async {
+    final plnClient = ref.read(plnClientProvider)!;
     try {
       debugPrint("checking status for ${state?.invoice}");
       final response = await plnClient
@@ -98,5 +102,5 @@ class SendNotifier extends StateNotifier<Send?> {
 }
 
 final sendProvider = StateNotifierProvider<SendNotifier, Send?>((ref) {
-  return SendNotifier();
+  return SendNotifier(ref);
 });

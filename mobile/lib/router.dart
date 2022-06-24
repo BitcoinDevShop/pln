@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:pln/main.dart';
 import 'package:pln/screens/channel_status.dart';
+import 'package:pln/screens/welcome.dart';
 
 import './screens/channel.dart';
 import 'screens/channel_fund.dart';
@@ -14,7 +16,7 @@ import 'screens/send_status.dart';
 
 /// Caches and Exposes a [GoRouter]
 final routerProvider = Provider<GoRouter>((ref) {
-  final router = RouterNotifier();
+  final router = RouterNotifier(ref);
 
   return GoRouter(
     debugLogDiagnostics: true, // For demo purposes
@@ -25,22 +27,23 @@ final routerProvider = Provider<GoRouter>((ref) {
 });
 
 class RouterNotifier extends ChangeNotifier {
-  // final Ref _ref;
+  final Ref _ref;
 
-  // /// This implementation exploits `ref.listen()` to add a simple callback that
-  // /// calls `notifyListeners()` whenever there's change onto a desider provider.
-  // RouterNotifier(this._ref) {
-  //   _ref.listen<String?>(
-  //     prefProvider,
-  //     (_, __) => notifyListeners(),
-  //   );
-  // }
+  /// This implementation exploits `ref.listen()` to add a simple callback that
+  /// calls `notifyListeners()` whenever there's change onto a desider provider.
+  RouterNotifier(this._ref) {
+    _ref.listen<String?>(
+      prefProvider,
+      (_, __) => notifyListeners(),
+    );
+  }
 
   String? _redirectLogic(GoRouterState state) {
     return null;
   }
 
   List<GoRoute> get _routes => [
+        GoRoute(path: "/welcome", builder: (context, state) => const Welcome()),
         GoRoute(path: "/", builder: (context, state) => const Home(), routes: [
           GoRoute(
               path: "send",

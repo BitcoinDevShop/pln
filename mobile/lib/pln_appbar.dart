@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'constants.dart';
 
@@ -28,11 +29,16 @@ class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(title,
-              style: Theme.of(context)
-                  .textTheme
-                  .headline1
-                  ?.copyWith(color: home ? blue : black)),
+          home
+              ? GestureDetector(
+                  onTap: () => context.go("/welcome"),
+                  child: Text(title,
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline1
+                          ?.copyWith(color: blue)),
+                )
+              : Text(title, style: Theme.of(context).textTheme.headline1),
           backAction != null
               ? InkWell(
                   onTap: backAction,

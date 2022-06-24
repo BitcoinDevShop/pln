@@ -27,7 +27,7 @@ cargo run  -- --development-mode=true --network=regtest --bitcoind-rpc-host=loca
 Paul
 
 ```
-cargo run  -- --development-mode=true --network=regtest --bitcoind-rpc-host=localhost --bitcoind-rpc-port=18443 --bitcoind-rpc-username=admin1 --bitcoind-rpc-password=123 --data-dir=./.data
+cargo run  -- --development-mode=true --network=regtest --bitcoind-rpc-host=localhost --bitcoind-rpc-port=18443 --bitcoind-rpc-username=polaruser --bitcoind-rpc-password=polarpass --data-dir=./.data
 ```
 
 The GRPC should run on `5401`

@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:pln/generated/pln.pbgrpc.dart';
 import 'package:riverpod/riverpod.dart';
 
+// ignore: depend_on_referenced_packages
 import 'package:fixnum/fixnum.dart' show Int64;
+import 'package:pln/grpc.dart';
 
 import '../grpc.dart';
 
@@ -41,7 +43,9 @@ class Channel {
 }
 
 class ChannelNotifier extends StateNotifier<Channel?> {
-  ChannelNotifier() : super(null);
+  ChannelNotifier(this.ref) : super(null);
+
+  final Ref ref;
 
   Timer? _timer;
 
@@ -51,6 +55,7 @@ class ChannelNotifier extends StateNotifier<Channel?> {
   }
 
   openChannel() async {
+    final plnClient = ref.read(plnClientProvider)!;
     try {
       debugPrint("creating channel...");
       final response = await plnClient.openChannel(OpenChannelRequest(
@@ -66,6 +71,7 @@ class ChannelNotifier extends StateNotifier<Channel?> {
   }
 
   checkChannelStatus() async {
+    final plnClient = ref.read(plnClientProvider)!;
     try {
       final response =
           await plnClient.getChannel(GetChannelRequest(id: state?.id));
@@ -103,5 +109,5 @@ class ChannelNotifier extends StateNotifier<Channel?> {
 }
 
 final channelProvider = StateNotifierProvider<ChannelNotifier, Channel?>((ref) {
-  return ChannelNotifier();
+  return ChannelNotifier(ref);
 });
