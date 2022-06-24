@@ -66,7 +66,7 @@ pub enum ManagerResponse {
 pub struct ManagerService {
     pub admin_service: Arc<AdminService>,
     pub root_node_pubkey: String,
-    internal_channel_id_map: Arc<Mutex<HashMap<String, String>>>,
+    internal_channel_id_map: Arc<Mutex<HashMap<String, PendingChannelDetails>>>,
 }
 
 impl ManagerService {
@@ -77,6 +77,12 @@ impl ManagerService {
             internal_channel_id_map: Arc::new(Mutex::new(HashMap::new())),
         }
     }
+}
+
+struct PendingChannelDetails {
+    from_node: String,
+    to_node: String,
+    amt: u64,
 }
 
 #[derive(Serialize, Debug)]
@@ -273,7 +279,7 @@ impl ManagerService {
                                 public: false,
                             };
                             let channel_req = NodeRequest::OpenChannels {
-                                channels: vec![channel],
+                                channels: vec![channel.clone()],
                             };
 
                             let channel_resp = node_spawn.call(channel_req).await.unwrap();
@@ -287,10 +293,18 @@ impl ManagerService {
                             .unwrap();
 
                             // TODO map channel id to an internal id
-                            println!("channel_id: {}", channel_id);
-                            map.lock()
-                                .await
-                                .insert(internal_channel_id_copy.to_string(), channel_id);
+                            println!(
+                                "internal_channel_id: {},channel_id: {}",
+                                internal_channel_id_copy, channel_id
+                            );
+                            map.lock().await.insert(
+                                internal_channel_id_copy.to_string(),
+                                PendingChannelDetails {
+                                    from_node: node_spawn.get_pubkey(),
+                                    to_node: pubkey,
+                                    amt: channel.clone().amt_satoshis,
+                                },
+                            );
                             return;
                         }
                         // TODO delete
@@ -307,11 +321,15 @@ impl ManagerService {
             ManagerRequest::GetChannel { id } => {
                 // find the id in the map
                 let channel_map = self.internal_channel_id_map.lock().await;
-                let channel_id = channel_map.get(&id);
-                if let Some(_chan_id) = channel_id {
+                let pending_channel_deatils = channel_map.get(&id);
+                if let Some(pending_channel_deatils) = pending_channel_deatils {
                     // for each node in our pubkey list, check the channel status
                     let node_directory = self.admin_service.node_directory.lock().await;
-                    for (_node_pubkey, node_handle) in node_directory.iter() {
+                    for (node_pubkey, node_handle) in node_directory.iter() {
+                        if pending_channel_deatils.from_node != String::from(node_pubkey) {
+                            continue;
+                        }
+
                         let node = match node_handle {
                             Some(node) => Some(node.node.clone()),
                             None => None,
@@ -327,47 +345,42 @@ impl ManagerService {
                             },
                         };
                         let channel_resp = node.call(channel_req).await.unwrap();
-                        let channel_result = match channel_resp {
+                        let channel_status = match channel_resp {
                             senseicore::services::node::NodeResponse::ListChannels {
                                 channels,
                                 pagination: _,
                             } => {
-                                dbg!(channels.clone());
+                                let mut status = "not_found";
                                 for channel in channels {
-                                    /*
-                                    dbg!(channel.channel_id.clone());
-                                    dbg!(String::from(chan_id));
-                                    dbg!(channel.channel_id.clone() == String::from(chan_id));
-                                    if channel.channel_id == String::from(chan_id) {
+                                    dbg!(channel.clone());
+                                    if channel.clone().channel_value_satoshis
+                                        == pending_channel_deatils.amt
+                                        && channel.clone().counterparty_pubkey
+                                            == pending_channel_deatils.to_node
+                                    {
                                         if channel.is_funding_locked {
-                                            return Ok(ManagerResponse::GetChannel {
-                                                status: "good".to_string(),
-                                            });
+                                            status = "good";
+                                        } else {
+                                            status = "pending";
                                         }
                                     }
-                                    */
-
-                                    // TODO only looking for single channel
-                                    // sense I can't come back and look for
-                                    // channel id based on temporary sensei id
-                                    if channel.is_funding_locked {
-                                        return Ok(ManagerResponse::GetChannel {
-                                            status: "good".to_string(),
-                                        });
-                                    }
-                                    continue;
                                 }
+                                Some(status)
+                            }
+                            _ => None,
+                        };
+
+                        // if no good or pending status, then go to next node
+                        if let Some(status) = channel_status {
+                            if status == "good" {
+                                return Ok(ManagerResponse::GetChannel {
+                                    status: "good".to_string(),
+                                });
+                            } else if status == "pending" {
                                 return Ok(ManagerResponse::GetChannel {
                                     status: "pending".to_string(),
                                 });
                             }
-                            _ => Some(ManagerResponse::GetChannel {
-                                status: "pending".to_string(),
-                            }),
-                        };
-
-                        if channel_result.is_some() {
-                            return Ok(channel_result.unwrap());
                         }
                     }
 
@@ -376,7 +389,7 @@ impl ManagerService {
                     })
                 } else {
                     Ok(ManagerResponse::GetChannel {
-                        status: "pending".to_string(),
+                        status: "bad".to_string(),
                     })
                 }
             }
