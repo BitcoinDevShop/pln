@@ -31,6 +31,7 @@ use senseicore::services::admin::{AdminRequest, AdminResponse, AdminService};
 
 pub enum ManagerRequest {
     GetStatus {},
+    StartNodes {},
     OpenChannel {
         pubkey: String,
         connection_string: String,
@@ -52,6 +53,7 @@ pub enum ManagerRequest {
 #[serde(untagged)]
 pub enum ManagerResponse {
     GetStatus { running: bool },
+    StartNodes {},
     OpenChannel { id: String, address: String },
     GetChannel { status: String },
     SendPayment { status: String },
@@ -136,6 +138,38 @@ impl ManagerService {
                     }
                     None => Ok(ManagerResponse::GetStatus { running: false }),
                 }
+            }
+            ManagerRequest::StartNodes {} => {
+                println!("Trying to start all nodes...");
+                let get_nodes_req = AdminRequest::ListNodes {
+                    pagination: PaginationRequest::default(),
+                };
+                let get_node_resp = self.admin_service.call(get_nodes_req).await.unwrap(); // TODO do not unwrap
+                let pubkeys: Vec<String> = match get_node_resp {
+                    AdminResponse::ListNodes {
+                        nodes,
+                        pagination: _,
+                    } => Some(nodes.into_iter().map(|node| node.pubkey).collect()),
+                    _ => None,
+                }
+                .unwrap();
+                for node_pubkey in pubkeys {
+                    println!("Starting node: {}", node_pubkey.as_str());
+                    let pubkey = node_pubkey.to_string();
+                    let start_node_req = AdminRequest::StartNode {
+                        pubkey,
+                        passphrase: "password".to_string(),
+                    };
+                    let create_node_resp = self.admin_service.call(start_node_req).await.unwrap(); // TODO do not unwrap
+                    match create_node_resp {
+                        AdminResponse::StartNode { macaroon: _ } => {
+                            println!("Started node: {}", node_pubkey.as_str());
+                            ()
+                        }
+                        _ => println!("Could not start node: {}", node_pubkey.as_str()),
+                    }
+                }
+                Ok(ManagerResponse::StartNodes {})
             }
             ManagerRequest::OpenChannel {
                 pubkey,
@@ -356,18 +390,22 @@ impl ManagerService {
                     }
                     .unwrap();
 
-                    let balance_req = NodeRequest::SendPayment {
+                    let send_payment_req = NodeRequest::SendPayment {
                         invoice: invoice.clone(),
                     };
-                    let balance_resp = node.call(balance_req).await.unwrap();
-                    let status = match balance_resp {
-                        senseicore::services::node::NodeResponse::SendPayment {} => "pending",
-                        _ => "bad",
-                    };
-                    if status == "pending" {
-                        return Ok(ManagerResponse::SendPayment {
-                            status: "pending".to_string(),
-                        });
+                    let payment_resp = node.call(send_payment_req).await;
+
+                    // Don't fail if couldn't send, try next node in loop
+                    if let Ok(send_payment_resp) = payment_resp {
+                        let status = match send_payment_resp {
+                            senseicore::services::node::NodeResponse::SendPayment {} => "pending",
+                            _ => "bad",
+                        };
+                        if status == "pending" {
+                            return Ok(ManagerResponse::SendPayment {
+                                status: "pending".to_string(),
+                            });
+                        }
                     }
                 }
 
