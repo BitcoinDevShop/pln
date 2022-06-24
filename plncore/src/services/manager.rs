@@ -31,6 +31,7 @@ use senseicore::services::admin::{AdminRequest, AdminResponse, AdminService};
 
 pub enum ManagerRequest {
     GetStatus {},
+    StartNodes {},
     OpenChannel {
         pubkey: String,
         connection_string: String,
@@ -52,6 +53,7 @@ pub enum ManagerRequest {
 #[serde(untagged)]
 pub enum ManagerResponse {
     GetStatus { running: bool },
+    StartNodes {},
     OpenChannel { id: String, address: String },
     GetChannel { status: String },
     SendPayment { status: String },
@@ -64,8 +66,7 @@ pub enum ManagerResponse {
 pub struct ManagerService {
     pub admin_service: Arc<AdminService>,
     pub root_node_pubkey: String,
-    internal_channel_id_map: Arc<Mutex<HashMap<String, String>>>,
-    internal_node_map: Arc<Mutex<Vec<String>>>,
+    internal_channel_id_map: Arc<Mutex<HashMap<String, PendingChannelDetails>>>,
 }
 
 impl ManagerService {
@@ -74,9 +75,14 @@ impl ManagerService {
             admin_service,
             root_node_pubkey,
             internal_channel_id_map: Arc::new(Mutex::new(HashMap::new())),
-            internal_node_map: Arc::new(Mutex::new(vec![])),
         }
     }
+}
+
+struct PendingChannelDetails {
+    from_node: String,
+    to_node: String,
+    amt: u64,
 }
 
 #[derive(Serialize, Debug)]
@@ -139,7 +145,38 @@ impl ManagerService {
                     None => Ok(ManagerResponse::GetStatus { running: false }),
                 }
             }
-            // TODO
+            ManagerRequest::StartNodes {} => {
+                println!("Trying to start all nodes...");
+                let get_nodes_req = AdminRequest::ListNodes {
+                    pagination: PaginationRequest::default(),
+                };
+                let get_node_resp = self.admin_service.call(get_nodes_req).await.unwrap(); // TODO do not unwrap
+                let pubkeys: Vec<String> = match get_node_resp {
+                    AdminResponse::ListNodes {
+                        nodes,
+                        pagination: _,
+                    } => Some(nodes.into_iter().map(|node| node.pubkey).collect()),
+                    _ => None,
+                }
+                .unwrap();
+                for node_pubkey in pubkeys {
+                    println!("Starting node: {}", node_pubkey.as_str());
+                    let pubkey = node_pubkey.to_string();
+                    let start_node_req = AdminRequest::StartNode {
+                        pubkey,
+                        passphrase: "password".to_string(),
+                    };
+                    let create_node_resp = self.admin_service.call(start_node_req).await.unwrap(); // TODO do not unwrap
+                    match create_node_resp {
+                        AdminResponse::StartNode { macaroon: _ } => {
+                            println!("Started node: {}", node_pubkey.as_str());
+                            ()
+                        }
+                        _ => println!("Could not start node: {}", node_pubkey.as_str()),
+                    }
+                }
+                Ok(ManagerResponse::StartNodes {})
+            }
             ManagerRequest::OpenChannel {
                 pubkey,
                 connection_string,
@@ -188,11 +225,6 @@ impl ManagerService {
                     _ => None,
                 }
                 .unwrap();
-
-                self.internal_node_map
-                    .lock()
-                    .await
-                    .push(new_node.pubkey.clone());
 
                 // Then get an address for the node
                 let node_directory = self.admin_service.node_directory.lock().await;
@@ -247,7 +279,7 @@ impl ManagerService {
                                 public: false,
                             };
                             let channel_req = NodeRequest::OpenChannels {
-                                channels: vec![channel],
+                                channels: vec![channel.clone()],
                             };
 
                             let channel_resp = node_spawn.call(channel_req).await.unwrap();
@@ -261,10 +293,18 @@ impl ManagerService {
                             .unwrap();
 
                             // TODO map channel id to an internal id
-                            println!("channel_id: {}", channel_id);
-                            map.lock()
-                                .await
-                                .insert(internal_channel_id_copy.to_string(), channel_id);
+                            println!(
+                                "internal_channel_id: {},channel_id: {}",
+                                internal_channel_id_copy, channel_id
+                            );
+                            map.lock().await.insert(
+                                internal_channel_id_copy.to_string(),
+                                PendingChannelDetails {
+                                    from_node: node_spawn.get_pubkey(),
+                                    to_node: pubkey,
+                                    amt: channel.clone().amt_satoshis,
+                                },
+                            );
                             return;
                         }
                         // TODO delete
@@ -278,21 +318,21 @@ impl ManagerService {
                     address,
                 })
             }
-            // TODO
             ManagerRequest::GetChannel { id } => {
                 // find the id in the map
                 let channel_map = self.internal_channel_id_map.lock().await;
-                let channel_id = channel_map.get(&id);
-                if let Some(_chan_id) = channel_id {
+                let pending_channel_deatils = channel_map.get(&id);
+                if let Some(pending_channel_deatils) = pending_channel_deatils {
                     // for each node in our pubkey list, check the channel status
-                    let node_list = self.internal_node_map.lock().await;
                     let node_directory = self.admin_service.node_directory.lock().await;
+                    for (node_pubkey, node_handle) in node_directory.iter() {
+                        if pending_channel_deatils.from_node != String::from(node_pubkey) {
+                            continue;
+                        }
 
-                    for node_pubkey in node_list.iter() {
-                        // find the node
-                        let node = match node_directory.get(node_pubkey) {
-                            Some(Some(node_handle)) => Ok(node_handle.node.clone()),
-                            _ => Err("node not found"),
+                        let node = match node_handle {
+                            Some(node) => Some(node.node.clone()),
+                            None => None,
                         }
                         .unwrap();
 
@@ -305,47 +345,42 @@ impl ManagerService {
                             },
                         };
                         let channel_resp = node.call(channel_req).await.unwrap();
-                        let channel_result = match channel_resp {
+                        let channel_status = match channel_resp {
                             senseicore::services::node::NodeResponse::ListChannels {
                                 channels,
                                 pagination: _,
                             } => {
-                                dbg!(channels.clone());
+                                let mut status = "not_found";
                                 for channel in channels {
-                                    /*
-                                    dbg!(channel.channel_id.clone());
-                                    dbg!(String::from(chan_id));
-                                    dbg!(channel.channel_id.clone() == String::from(chan_id));
-                                    if channel.channel_id == String::from(chan_id) {
+                                    dbg!(channel.clone());
+                                    if channel.clone().channel_value_satoshis
+                                        == pending_channel_deatils.amt
+                                        && channel.clone().counterparty_pubkey
+                                            == pending_channel_deatils.to_node
+                                    {
                                         if channel.is_funding_locked {
-                                            return Ok(ManagerResponse::GetChannel {
-                                                status: "good".to_string(),
-                                            });
+                                            status = "good";
+                                        } else {
+                                            status = "pending";
                                         }
                                     }
-                                    */
-
-                                    // TODO only looking for single channel
-                                    // sense I can't come back and look for
-                                    // channel id based on temporary sensei id
-                                    if channel.is_funding_locked {
-                                        return Ok(ManagerResponse::GetChannel {
-                                            status: "good".to_string(),
-                                        });
-                                    }
-                                    continue;
                                 }
+                                Some(status)
+                            }
+                            _ => None,
+                        };
+
+                        // if no good or pending status, then go to next node
+                        if let Some(status) = channel_status {
+                            if status == "good" {
+                                return Ok(ManagerResponse::GetChannel {
+                                    status: "good".to_string(),
+                                });
+                            } else if status == "pending" {
                                 return Ok(ManagerResponse::GetChannel {
                                     status: "pending".to_string(),
                                 });
                             }
-                            _ => Some(ManagerResponse::GetChannel {
-                                status: "pending".to_string(),
-                            }),
-                        };
-
-                        if channel_result.is_some() {
-                            return Ok(channel_result.unwrap());
                         }
                     }
 
@@ -354,36 +389,36 @@ impl ManagerService {
                     })
                 } else {
                     Ok(ManagerResponse::GetChannel {
-                        status: "pending".to_string(),
+                        status: "bad".to_string(),
                     })
                 }
             }
-            // TODO
             ManagerRequest::SendPayment { invoice } => {
                 // for each node in our pubkey list, attempt payment
-                let node_list = self.internal_node_map.lock().await;
                 let node_directory = self.admin_service.node_directory.lock().await;
-
-                for node_pubkey in node_list.iter() {
-                    // find the node
-                    let node = match node_directory.get(node_pubkey) {
-                        Some(Some(node_handle)) => Ok(node_handle.node.clone()),
-                        _ => Err("node not found"),
+                for (_node_pubkey, node_handle) in node_directory.iter() {
+                    let node = match node_handle {
+                        Some(node) => Some(node.node.clone()),
+                        None => None,
                     }
                     .unwrap();
 
-                    let balance_req = NodeRequest::SendPayment {
+                    let send_payment_req = NodeRequest::SendPayment {
                         invoice: invoice.clone(),
                     };
-                    let balance_resp = node.call(balance_req).await.unwrap();
-                    let status = match balance_resp {
-                        senseicore::services::node::NodeResponse::SendPayment {} => "pending",
-                        _ => "bad",
-                    };
-                    if status == "pending" {
-                        return Ok(ManagerResponse::SendPayment {
-                            status: "pending".to_string(),
-                        });
+                    let payment_resp = node.call(send_payment_req).await;
+
+                    // Don't fail if couldn't send, try next node in loop
+                    if let Ok(send_payment_resp) = payment_resp {
+                        let status = match send_payment_resp {
+                            senseicore::services::node::NodeResponse::SendPayment {} => "pending",
+                            _ => "bad",
+                        };
+                        if status == "pending" {
+                            return Ok(ManagerResponse::SendPayment {
+                                status: "pending".to_string(),
+                            });
+                        }
                     }
                 }
 
@@ -395,20 +430,16 @@ impl ManagerService {
             ManagerRequest::SendStatus { invoice: _ } => Ok(ManagerResponse::SendStatus {
                 status: "good".to_string(),
             }),
-            // TODO
             ManagerRequest::GetBalance {} => {
                 // get the amount from each of the nodes we have saved
                 let mut amt_satoshis = 0;
 
                 // for each node in our pubkey list, check the channel status
-                let node_list = self.internal_node_map.lock().await;
                 let node_directory = self.admin_service.node_directory.lock().await;
-
-                for node_pubkey in node_list.iter() {
-                    // find the node
-                    let node = match node_directory.get(node_pubkey) {
-                        Some(Some(node_handle)) => Ok(node_handle.node.clone()),
-                        _ => Err("node not found"),
+                for (_node_pubkey, node_handle) in node_directory.iter() {
+                    let node = match node_handle {
+                        Some(node) => Some(node.node.clone()),
+                        None => None,
                     }
                     .unwrap();
 

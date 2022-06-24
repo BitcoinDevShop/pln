@@ -279,8 +279,14 @@ fn main() -> Result<()> {
             _ => false,
         };
 
-        // got a node!
-        println!("node: {}, running: {}", root_node.get_pubkey(), status);
+        // got a root node!
+        println!("root node: {}, running: {}", root_node.get_pubkey(), status);
+
+        // now start any nodes we have in our db
+        let _start_res = manager_service
+            .clone()
+            .call(ManagerRequest::StartNodes {})
+            .await;
 
         let router = Router::new();
 
