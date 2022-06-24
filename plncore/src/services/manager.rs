@@ -65,7 +65,6 @@ pub struct ManagerService {
     pub admin_service: Arc<AdminService>,
     pub root_node_pubkey: String,
     internal_channel_id_map: Arc<Mutex<HashMap<String, String>>>,
-    internal_node_map: Arc<Mutex<Vec<String>>>,
 }
 
 impl ManagerService {
@@ -74,7 +73,6 @@ impl ManagerService {
             admin_service,
             root_node_pubkey,
             internal_channel_id_map: Arc::new(Mutex::new(HashMap::new())),
-            internal_node_map: Arc::new(Mutex::new(vec![])),
         }
     }
 }
@@ -139,7 +137,6 @@ impl ManagerService {
                     None => Ok(ManagerResponse::GetStatus { running: false }),
                 }
             }
-            // TODO
             ManagerRequest::OpenChannel {
                 pubkey,
                 connection_string,
@@ -188,11 +185,6 @@ impl ManagerService {
                     _ => None,
                 }
                 .unwrap();
-
-                self.internal_node_map
-                    .lock()
-                    .await
-                    .push(new_node.pubkey.clone());
 
                 // Then get an address for the node
                 let node_directory = self.admin_service.node_directory.lock().await;
@@ -278,21 +270,17 @@ impl ManagerService {
                     address,
                 })
             }
-            // TODO
             ManagerRequest::GetChannel { id } => {
                 // find the id in the map
                 let channel_map = self.internal_channel_id_map.lock().await;
                 let channel_id = channel_map.get(&id);
                 if let Some(_chan_id) = channel_id {
                     // for each node in our pubkey list, check the channel status
-                    let node_list = self.internal_node_map.lock().await;
                     let node_directory = self.admin_service.node_directory.lock().await;
-
-                    for node_pubkey in node_list.iter() {
-                        // find the node
-                        let node = match node_directory.get(node_pubkey) {
-                            Some(Some(node_handle)) => Ok(node_handle.node.clone()),
-                            _ => Err("node not found"),
+                    for (_node_pubkey, node_handle) in node_directory.iter() {
+                        let node = match node_handle {
+                            Some(node) => Some(node.node.clone()),
+                            None => None,
                         }
                         .unwrap();
 
@@ -358,17 +346,13 @@ impl ManagerService {
                     })
                 }
             }
-            // TODO
             ManagerRequest::SendPayment { invoice } => {
                 // for each node in our pubkey list, attempt payment
-                let node_list = self.internal_node_map.lock().await;
                 let node_directory = self.admin_service.node_directory.lock().await;
-
-                for node_pubkey in node_list.iter() {
-                    // find the node
-                    let node = match node_directory.get(node_pubkey) {
-                        Some(Some(node_handle)) => Ok(node_handle.node.clone()),
-                        _ => Err("node not found"),
+                for (_node_pubkey, node_handle) in node_directory.iter() {
+                    let node = match node_handle {
+                        Some(node) => Some(node.node.clone()),
+                        None => None,
                     }
                     .unwrap();
 
@@ -395,20 +379,16 @@ impl ManagerService {
             ManagerRequest::SendStatus { invoice: _ } => Ok(ManagerResponse::SendStatus {
                 status: "good".to_string(),
             }),
-            // TODO
             ManagerRequest::GetBalance {} => {
                 // get the amount from each of the nodes we have saved
                 let mut amt_satoshis = 0;
 
                 // for each node in our pubkey list, check the channel status
-                let node_list = self.internal_node_map.lock().await;
                 let node_directory = self.admin_service.node_directory.lock().await;
-
-                for node_pubkey in node_list.iter() {
-                    // find the node
-                    let node = match node_directory.get(node_pubkey) {
-                        Some(Some(node_handle)) => Ok(node_handle.node.clone()),
-                        _ => Err("node not found"),
+                for (_node_pubkey, node_handle) in node_directory.iter() {
+                    let node = match node_handle {
+                        Some(node) => Some(node.node.clone()),
+                        None => None,
                     }
                     .unwrap();
 
