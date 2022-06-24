@@ -1,10 +1,10 @@
-# pLN - privacy is the only option 
+# pLN - privacy is the only option
 
-* Spin up a new node for every channel open
-* Fund channels with an external wallet, and no change!
-* Sending
-* No receive lol
-* DO NOT USE THIS ISN'T EVEN ALPHA YET
+- Spin up a new node for every channel open
+- Fund channels with an external wallet, and no change!
+- Sending
+- No receive lol
+- DO NOT USE THIS ISN'T EVEN ALPHA YET
 
 Here's our hackathon presentation: [slides](https://github.com/BitcoinDevShop/pln/files/8893172/pln.pdf) and [video](https://www.youtube.com/watch?v=gaQ0m1AMpq0?start=6454)
 
@@ -16,7 +16,7 @@ Here's our hackathon presentation: [slides](https://github.com/BitcoinDevShop/pl
 
 <img width="702" alt="Screen Shot 2022-06-13 at 10 12 12 AM" src="https://user-images.githubusercontent.com/543668/173408613-aebf32e3-d751-4c50-80c9-1125b1fc61ec.png">
 
-## Running
+## Running Rust backend
 
 Tony
 
@@ -31,6 +31,19 @@ cargo run  -- --development-mode=true --network=regtest --bitcoind-rpc-host=loca
 ```
 
 The GRPC should run on `5401`
+
+## Running Flutter frontend
+
+[Install Flutter](https://docs.flutter.dev/get-started/install) for your dev OS and chosen target.
+
+`flutter doctor` will let you know how your setup is looking.
+
+Follow the relevant instructions for running a Flutter app from your IDE (this is nice because you get better debugging and hot reload).
+
+If you want to run from the terminal, enter the `/mobile` dir and run one of these:
+`flutter -d macos` for Mac
+`flutter -d linux` for Linux
+`flutter -d <device id>` for an iOS or Android simulator (list available simulators via `flutter devices`)
 
 ## regen protobuf stuff for flutter:
 
@@ -90,5 +103,3 @@ bitcoin-cli -named sendtoaddress address="bcrt1qmjwu997paw5pec8kp4t2qzuktw5anqyf
 - [ ] Tony: Token authscan
 - [ ] Paul: Make it prettier
 - [ ] Tony: multi-node payments (virtual channels?)
-
-
