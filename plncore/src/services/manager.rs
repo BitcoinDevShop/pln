@@ -19,13 +19,11 @@ use crate::{config::SenseiConfig, hex_utils, node::LightningNode, version};
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 
-use senseicore::services::node::{NodeRequest, OpenChannelInfo};
+use senseicore::services::node::{NodeRequest, OpenChannelRequest};
 use senseicore::services::PaginationRequest;
 use serde::Serialize;
-use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::Mutex;
 
 use senseicore::services::admin::{AdminRequest, AdminResponse, AdminService};
 
@@ -66,7 +64,6 @@ pub enum ManagerResponse {
 pub struct ManagerService {
     pub admin_service: Arc<AdminService>,
     pub root_node_pubkey: String,
-    internal_channel_id_map: Arc<Mutex<HashMap<String, PendingChannelDetails>>>,
 }
 
 impl ManagerService {
@@ -74,15 +71,8 @@ impl ManagerService {
         Self {
             admin_service,
             root_node_pubkey,
-            internal_channel_id_map: Arc::new(Mutex::new(HashMap::new())),
         }
     }
-}
-
-struct PendingChannelDetails {
-    from_node: String,
-    to_node: String,
-    amt: u64,
 }
 
 #[derive(Serialize, Debug)]
@@ -246,9 +236,7 @@ impl ManagerService {
 
                 // make an ID for the temp channel to map to?
                 let mut rng = rand::thread_rng();
-                let internal_channel_id: u16 = rng.gen();
-                let internal_channel_id_copy = Arc::new(internal_channel_id);
-                let map = self.internal_channel_id_map.clone();
+                let internal_channel_id: u64 = rng.gen();
 
                 // Loop through waiting for funding
                 let node_spawn = node.clone();
@@ -260,10 +248,13 @@ impl ManagerService {
                         let balance_resp = node_spawn.call(balance_req).await.unwrap();
                         let balance = match balance_resp {
                             senseicore::services::node::NodeResponse::GetBalance {
-                                balance_satoshis,
+                                onchain_balance_sats,
+                                channel_balance_msats,
+                                ..
                             } => {
-                                dbg!(balance_satoshis);
-                                Some(balance_satoshis)
+                                let total = onchain_balance_sats + channel_balance_msats / 1000;
+                                dbg!(total);
+                                Some(total)
                             }
                             _ => None,
                         };
@@ -273,38 +264,34 @@ impl ManagerService {
                             // TODO delete
                             println!("funding complete haha");
 
-                            let channel = OpenChannelInfo {
-                                node_connection_string: format!("{}@{}", pubkey, connection_string),
-                                amt_satoshis: balance.unwrap() - 1000, // TODO better fees
+                            // TODO set new custom_id field and use that for lookups
+                            let channel = OpenChannelRequest {
+                                counterparty_pubkey: pubkey.clone(),
+                                counterparty_host_port: Some(connection_string),
+                                amount_sats: balance.unwrap() - 1000, // TODO better fees
                                 public: false,
+                                custom_id: Some(internal_channel_id),
+                                push_amount_msats: Some(0),
+                                forwarding_fee_proportional_millionths: None,
+                                forwarding_fee_base_msat: None,
+                                cltv_expiry_delta: None,
+                                max_dust_htlc_exposure_msat: None,
+                                force_close_avoidance_max_fee_satoshis: None,
                             };
                             let channel_req = NodeRequest::OpenChannels {
-                                channels: vec![channel.clone()],
+                                requests: vec![channel.clone()],
                             };
 
                             let channel_resp = node_spawn.call(channel_req).await.unwrap();
-                            let channel_id = match channel_resp {
+                            let _channel_id = match channel_resp {
                                 senseicore::services::node::NodeResponse::OpenChannels {
-                                    channels: _,
+                                    requests: _,
                                     results,
-                                } => Some(results[0].temp_channel_id.clone().unwrap()),
+                                } => Some(results[0].channel_id.clone().unwrap()),
                                 _ => None,
                             }
                             .unwrap();
 
-                            // TODO map channel id to an internal id
-                            println!(
-                                "internal_channel_id: {},channel_id: {}",
-                                internal_channel_id_copy, channel_id
-                            );
-                            map.lock().await.insert(
-                                internal_channel_id_copy.to_string(),
-                                PendingChannelDetails {
-                                    from_node: node_spawn.get_pubkey(),
-                                    to_node: pubkey,
-                                    amt: channel.clone().amt_satoshis,
-                                },
-                            );
                             return;
                         }
                         // TODO delete
@@ -319,79 +306,62 @@ impl ManagerService {
                 })
             }
             ManagerRequest::GetChannel { id } => {
-                // find the id in the map
-                let channel_map = self.internal_channel_id_map.lock().await;
-                let pending_channel_deatils = channel_map.get(&id);
-                if let Some(pending_channel_deatils) = pending_channel_deatils {
-                    // for each node in our pubkey list, check the channel status
-                    let node_directory = self.admin_service.node_directory.lock().await;
-                    for (node_pubkey, node_handle) in node_directory.iter() {
-                        if pending_channel_deatils.from_node != String::from(node_pubkey) {
-                            continue;
-                        }
+                // for each node in our pubkey list, check the channel status
+                let id_int = id.parse::<u64>().unwrap();
+                let node_directory = self.admin_service.node_directory.lock().await;
+                for (_node_pubkey, node_handle) in node_directory.iter() {
+                    let node = match node_handle {
+                        Some(node) => Some(node.node.clone()),
+                        None => None,
+                    }
+                    .unwrap();
 
-                        let node = match node_handle {
-                            Some(node) => Some(node.node.clone()),
-                            None => None,
-                        }
-                        .unwrap();
-
-                        // now go check channel id status
-                        let channel_req = NodeRequest::ListChannels {
-                            pagination: PaginationRequest {
-                                page: 0,
-                                take: 100,
-                                query: None,
-                            },
-                        };
-                        let channel_resp = node.call(channel_req).await.unwrap();
-                        let channel_status = match channel_resp {
-                            senseicore::services::node::NodeResponse::ListChannels {
-                                channels,
-                                pagination: _,
-                            } => {
-                                let mut status = "not_found";
-                                for channel in channels {
-                                    dbg!(channel.clone());
-                                    if channel.clone().channel_value_satoshis
-                                        == pending_channel_deatils.amt
-                                        && channel.clone().counterparty_pubkey
-                                            == pending_channel_deatils.to_node
-                                    {
-                                        if channel.is_funding_locked {
-                                            status = "good";
-                                        } else {
-                                            status = "pending";
-                                        }
+                    // now go check channel id status
+                    let channel_req = NodeRequest::ListChannels {
+                        pagination: PaginationRequest {
+                            page: 0,
+                            take: 100,
+                            query: None,
+                        },
+                    };
+                    let channel_resp = node.call(channel_req).await.unwrap();
+                    let channel_status = match channel_resp {
+                        senseicore::services::node::NodeResponse::ListChannels {
+                            channels,
+                            pagination: _,
+                        } => {
+                            let mut status = "not_found";
+                            for channel in channels {
+                                if channel.clone().user_channel_id == id_int {
+                                    if channel.is_channel_ready {
+                                        status = "good";
+                                    } else {
+                                        status = "pending";
                                     }
                                 }
-                                Some(status)
                             }
-                            _ => None,
-                        };
+                            Some(status)
+                        }
+                        _ => None,
+                    };
 
-                        // if no good or pending status, then go to next node
-                        if let Some(status) = channel_status {
-                            if status == "good" {
-                                return Ok(ManagerResponse::GetChannel {
-                                    status: "good".to_string(),
-                                });
-                            } else if status == "pending" {
-                                return Ok(ManagerResponse::GetChannel {
-                                    status: "pending".to_string(),
-                                });
-                            }
+                    // if no good or pending status, then go to next node
+                    if let Some(status) = channel_status {
+                        if status == "good" {
+                            return Ok(ManagerResponse::GetChannel {
+                                status: "good".to_string(),
+                            });
+                        } else if status == "pending" {
+                            return Ok(ManagerResponse::GetChannel {
+                                status: "pending".to_string(),
+                            });
                         }
                     }
-
-                    Ok(ManagerResponse::GetChannel {
-                        status: "pending".to_string(),
-                    })
-                } else {
-                    Ok(ManagerResponse::GetChannel {
-                        status: "bad".to_string(),
-                    })
                 }
+
+                Ok(ManagerResponse::GetChannel {
+                    status: "pending".to_string(),
+                })
             }
             ManagerRequest::SendPayment { invoice } => {
                 // for each node in our pubkey list, attempt payment
@@ -447,8 +417,10 @@ impl ManagerService {
                     let balance_resp = node.call(balance_req).await.unwrap();
                     let balance = match balance_resp {
                         senseicore::services::node::NodeResponse::GetBalance {
-                            balance_satoshis,
-                        } => balance_satoshis,
+                            onchain_balance_sats,
+                            channel_balance_msats,
+                            ..
+                        } => onchain_balance_sats + channel_balance_msats / 1000,
                         _ => 0,
                     };
                     amt_satoshis += balance;
