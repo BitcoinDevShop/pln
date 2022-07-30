@@ -31,12 +31,16 @@ use axum::{extract::Extension, Router};
 use clap::Parser;
 
 use grpc::manager::{ManagerServer, ManagerService as GrpcManagerService};
-use std::net::SocketAddr;
 use std::time::Duration;
 use tower_cookies::CookieManagerLayer;
 
 use std::fs;
 use std::sync::Arc;
+
+use std::{
+    net::SocketAddr,
+    sync::atomic::{AtomicBool, Ordering},
+};
 use tonic::transport::Server;
 
 use tokio::runtime::Builder;
@@ -79,6 +83,12 @@ fn main() -> Result<()> {
     env_logger::init();
     macaroon::initialize().expect("failed to initialize macaroons");
     let args = SenseiArgs::parse();
+
+    let stop_signal = Arc::new(AtomicBool::new(false));
+
+    for term_signal in signal_hook::consts::TERM_SIGNALS {
+        signal_hook::flag::register(*term_signal, Arc::clone(&stop_signal)).unwrap();
+    }
 
     let sensei_dir = if let Some(dir) = args.data_dir {
         dir
@@ -201,6 +211,7 @@ fn main() -> Result<()> {
             .unwrap(),
         );
 
+        let admin_service_stop_signal = stop_signal.clone();
         let admin_service = Arc::new(
             AdminService::new(
                 &sensei_dir,
@@ -208,6 +219,8 @@ fn main() -> Result<()> {
                 database,
                 chain_manager,
                 event_sender,
+                tokio::runtime::Handle::current(),
+                admin_service_stop_signal,
             )
             .await,
         );
@@ -310,7 +323,11 @@ fn main() -> Result<()> {
 
         let server = hyper::Server::bind(&addr).serve(hybrid_service);
 
-        println!("yay");
+        tokio::spawn(async move {
+            if let Err(e) = server.await {
+                eprintln!("server errored with: {:?}", e);
+            }
+        });
 
         println!(
             "manage your sensei node at http://{}:{}/admin/nodes",
@@ -318,8 +335,13 @@ fn main() -> Result<()> {
             port
         );
 
-        if let Err(e) = server.await {
-            eprintln!("server error: {}", e);
+        let mut interval = tokio::time::interval(Duration::from_millis(250));
+        loop {
+            interval.tick().await;
+            if stop_signal.load(Ordering::Acquire) {
+                let _res = admin_service.stop().await;
+                break;
+            }
         }
     });
 
