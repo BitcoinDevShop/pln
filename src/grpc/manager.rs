@@ -12,8 +12,9 @@ use std::sync::Arc;
 pub use super::pln::manager_server::{Manager, ManagerServer};
 use super::pln::{
     GetBalanceRequest, GetBalanceResponse, GetChannelRequest, GetChannelResponse, GetStatusRequest,
-    GetStatusResponse, OpenChannelRequest, OpenChannelResponse, SendPaymentRequest,
-    SendPaymentResponse, SendStatusRequest, SendStatusResponse,
+    GetStatusResponse, ListChannelsRequest, ListChannelsResponse, OpenChannelRequest,
+    OpenChannelResponse, SendPaymentRequest, SendPaymentResponse, SendStatusRequest,
+    SendStatusResponse,
 };
 use plncore::services::manager::{ManagerRequest, ManagerResponse};
 use tonic::Response;
@@ -59,6 +60,12 @@ impl From<OpenChannelRequest> for ManagerRequest {
 impl From<GetChannelRequest> for ManagerRequest {
     fn from(req: GetChannelRequest) -> Self {
         ManagerRequest::GetChannel { id: req.id }
+    }
+}
+
+impl From<ListChannelsRequest> for ManagerRequest {
+    fn from(_req: ListChannelsRequest) -> Self {
+        ManagerRequest::ListChannels {}
     }
 }
 
@@ -134,6 +141,29 @@ impl TryFrom<ManagerResponse> for GetBalanceResponse {
     fn try_from(res: ManagerResponse) -> Result<Self, Self::Error> {
         match res {
             ManagerResponse::GetBalance { amt_satoshis } => Ok(Self { amt_satoshis }),
+            _ => Err("impossible".to_string()),
+        }
+    }
+}
+
+impl TryFrom<ManagerResponse> for ListChannelsResponse {
+    type Error = String;
+
+    fn try_from(res: ManagerResponse) -> Result<Self, Self::Error> {
+        match res {
+            ManagerResponse::ListChannels { channels } => {
+                let mut returned_channels: Vec<super::pln::Channel> = vec![];
+                for channel in channels {
+                    returned_channels.push(super::pln::Channel {
+                        node_alias: channel.node_alias,
+                        total_amt_satoshis: channel.total_amt_satoshis,
+                        balance_amt_satoshis: channel.balance_amt_satoshis,
+                    })
+                }
+                Ok(Self {
+                    channels: returned_channels,
+                })
+            }
             _ => Err("impossible".to_string()),
         }
     }
@@ -312,6 +342,22 @@ impl Manager for ManagerService {
         match self.manager_service.call(request).await {
             Ok(response) => {
                 let response: Result<GetBalanceResponse, String> = response.try_into();
+                response
+                    .map(Response::new)
+                    .map_err(|_err| tonic::Status::unknown("err"))
+            }
+            Err(_err) => Err(tonic::Status::unknown("error")),
+        }
+    }
+
+    async fn list_channels(
+        &self,
+        _request: tonic::Request<ListChannelsRequest>,
+    ) -> Result<tonic::Response<ListChannelsResponse>, tonic::Status> {
+        let request = ManagerRequest::ListChannels {};
+        match self.manager_service.call(request).await {
+            Ok(response) => {
+                let response: Result<ListChannelsResponse, String> = response.try_into();
                 response
                     .map(Response::new)
                     .map_err(|_err| tonic::Status::unknown("err"))

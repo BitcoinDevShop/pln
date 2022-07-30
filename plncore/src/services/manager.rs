@@ -45,6 +45,7 @@ pub enum ManagerRequest {
         invoice: String,
     },
     GetBalance {},
+    ListChannels {},
 }
 
 #[derive(Serialize)]
@@ -57,7 +58,15 @@ pub enum ManagerResponse {
     SendPayment { status: String },
     SendStatus { status: String },
     GetBalance { amt_satoshis: u64 },
+    ListChannels { channels: Vec<Channel> },
     Error(Error),
+}
+
+#[derive(Serialize)]
+pub struct Channel {
+    pub node_alias: String,
+    pub total_amt_satoshis: u64,
+    pub balance_amt_satoshis: u64,
 }
 
 #[derive(Clone)]
@@ -361,6 +370,47 @@ impl ManagerService {
 
                 Ok(ManagerResponse::GetChannel {
                     status: "pending".to_string(),
+                })
+            }
+            ManagerRequest::ListChannels {} => {
+                // for each node in our pubkey list, get the channels
+                let mut total_channels: Vec<Channel> = vec![];
+                let node_directory = self.admin_service.node_directory.lock().await;
+                for (_node_pubkey, node_handle) in node_directory.iter() {
+                    let node = match node_handle {
+                        Some(node) => Some(node.node.clone()),
+                        None => None,
+                    }
+                    .unwrap();
+
+                    // now go check channel id status
+                    let channel_req = NodeRequest::ListChannels {
+                        pagination: PaginationRequest {
+                            page: 0,
+                            take: 100,
+                            query: None,
+                        },
+                    };
+                    let channel_resp = node.call(channel_req).await.unwrap();
+                    match channel_resp {
+                        senseicore::services::node::NodeResponse::ListChannels {
+                            channels,
+                            pagination: _,
+                        } => {
+                            for channel in channels {
+                                total_channels.push(Channel {
+                                    node_alias: channel.counterparty_pubkey,
+                                    total_amt_satoshis: channel.channel_value_satoshis,
+                                    balance_amt_satoshis: channel.balance_msat / 1000,
+                                })
+                            }
+                        }
+                        _ => {}
+                    };
+                }
+
+                Ok(ManagerResponse::ListChannels {
+                    channels: total_channels,
                 })
             }
             ManagerRequest::SendPayment { invoice } => {

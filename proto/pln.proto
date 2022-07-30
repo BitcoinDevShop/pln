@@ -8,6 +8,7 @@ service Manager {
     rpc SendPayment (SendPaymentRequest) returns (SendPaymentResponse);
     rpc SendStatus (SendStatusRequest) returns (SendStatusResponse);
     rpc GetBalance (GetBalanceRequest) returns (GetBalanceResponse);
+    rpc ListChannels (ListChannelsRequest) returns (ListChannelsResponse);
 }
 
 message GetStatusRequest {}
@@ -30,6 +31,20 @@ message GetChannelRequest {
 }
 message GetChannelResponse {
     string status = 1; // good, pending, bad
+}
+
+message Channel {
+    string node_alias = 1; // the other node alias this channel is with
+    uint64 total_amt_satoshis = 2; // the amount of satoshis this channel total is for
+    uint64 balance_amt_satoshis = 3; // the amount of satoshis we can send
+}
+
+message ListChannelsRequest {
+    string id = 1;
+}
+
+message ListChannelsResponse {
+    repeated Channel channels = 1;
 }
 
 message SendPaymentRequest {
