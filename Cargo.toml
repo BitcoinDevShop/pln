@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
-members = [".", "entity", "migration", "plncore"]
+members = [".", "plnentity", "plnmigration", "plncore"]
 
 [dependencies]
 lightning = { version = "0.0.106", features = ["max_level_trace"], git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
@@ -15,7 +15,8 @@ lightning-invoice = { version = "0.14.0", git = "https://github.com/lightningdev
 lightning-net-tokio = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
 lightning-persister = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
 lightning-background-processor = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
-senseicore = { git = "https://github.com/L2-Technology/sensei", rev = "e209c2b174720e087f4fb93407def204adf4b293" }
+#senseicore = { git = "https://github.com/L2-Technology/sensei", rev = "e209c2b174720e087f4fb93407def204adf4b293" }
+senseicore = { path = "../../Lightning/sensei/senseicore"}
 base64 = "0.13.0"
 signal-hook = "0.3.14"
 bitcoin = "0.28.1"
@@ -51,8 +52,8 @@ dirs = "4.0"
 public-ip = "0.2"
 rust-embed="6.3.0"
 mime_guess = { version = "2" }
-entity = { path = "entity" }
-migration = { path = "migration" }
+plnentity = { path = "plnentity" }
+plnmigration = { path = "plnmigration" }
 # senseicore = { path = "senseicore" }
 plncore = { path = "plncore" }
 anyhow = "1.0.58"

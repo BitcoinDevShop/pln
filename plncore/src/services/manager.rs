@@ -100,8 +100,8 @@ impl From<macaroon::MacaroonError> for Error {
     }
 }
 
-impl From<migration::DbErr> for Error {
-    fn from(e: migration::DbErr) -> Self {
+impl From<plnmigration::DbErr> for Error {
+    fn from(e: plnmigration::DbErr) -> Self {
         Self::Generic(e.to_string())
     }
 }
@@ -270,6 +270,7 @@ impl ManagerService {
                                 counterparty_host_port: Some(connection_string),
                                 amount_sats: balance.unwrap() - 1000, // TODO better fees
                                 public: false,
+                                scid_alias: Some(true),
                                 custom_id: Some(internal_channel_id),
                                 push_amount_msats: Some(0),
                                 forwarding_fee_proportional_millionths: None,

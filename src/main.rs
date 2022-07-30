@@ -23,8 +23,8 @@ use senseicore::{
 
 use plncore::services::manager::{ManagerRequest, ManagerResponse, ManagerService};
 
-use entity::sea_orm::{self, ConnectOptions};
-use migration::{Migrator, MigratorTrait};
+use plnentity::sea_orm::{self, ConnectOptions};
+use plnmigration::{Migrator, MigratorTrait};
 use sea_orm::Database;
 
 use axum::{extract::Extension, Router};

@@ -1,11 +1,11 @@
 [package]
-name = "entity"
+name = "plnentity"
 version = "0.1.0"
 edition = "2021"
 publish = false
 
 [lib]
-name = "entity"
+name = "plnentity"
 path = "src/lib.rs"
 
 [dependencies]

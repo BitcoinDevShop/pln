@@ -1,13 +1,13 @@
 [package]
-name = "migration"
+name = "plnmigration"
 version = "0.1.0"
 edition = "2021"
 publish = false
 
 [lib]
-name = "migration"
+name = "plnmigration"
 path = "src/lib.rs"
 
 [dependencies]
 sea-schema = { version = "^0.7.1", default-features = false, features = [ "migration", "debug-print" ] }
-entity = { path = "../entity" }
+plnentity = { path = "../plnentity" }
