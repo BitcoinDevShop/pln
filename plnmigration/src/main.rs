@@ -1,4 +1,4 @@
-use migration::Migrator;
+use plnmigration::Migrator;
 use sea_schema::migration::*;
 
 #[async_std::main]

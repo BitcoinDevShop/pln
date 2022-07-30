@@ -44,9 +44,10 @@ dirs = "4.0"
 public-ip = "0.2"
 rust-embed="6.3.0"
 mime_guess = { version = "2" }
-entity = { path = "../entity" }
-migration = { path = "../migration" }
-senseicore = { git = "https://github.com/L2-Technology/sensei", rev = "e209c2b174720e087f4fb93407def204adf4b293" }
+plnentity = { path = "../plnentity" }
+plnmigration = { path = "../plnmigration" }
+#senseicore = { git = "https://github.com/L2-Technology/sensei", rev = "e209c2b174720e087f4fb93407def204adf4b293" }
+senseicore = { path = "../../../Lightning/sensei/senseicore"}
 
 [dev-dependencies]
 bitcoind = { version = "0.26", features = [ "22_0" ] }
