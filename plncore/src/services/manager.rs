@@ -279,6 +279,7 @@ impl ManagerService {
                                 counterparty_host_port: Some(connection_string),
                                 amount_sats: balance.unwrap() - 1000, // TODO better fees
                                 public: false,
+                                scid_alias: Some(true),
                                 custom_id: Some(internal_channel_id),
                                 push_amount_msats: Some(0),
                                 forwarding_fee_proportional_millionths: None,
