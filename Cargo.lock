@@ -981,7 +981,7 @@ dependencies = [
 [[package]]
 name = "entity"
 version = "0.1.0"
-source = "git+https://github.com/L2-Technology/sensei?rev=e209c2b174720e087f4fb93407def204adf4b293#e209c2b174720e087f4fb93407def204adf4b293"
+source = "git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197#e79b5d2787b5449290be7ea7d2d97a6fccca3197"
 dependencies = [
  "bdk 0.19.0",
  "sea-orm",
@@ -1878,7 +1878,7 @@ dependencies = [
 [[package]]
 name = "migration"
 version = "0.1.0"
-source = "git+https://github.com/L2-Technology/sensei?rev=e209c2b174720e087f4fb93407def204adf4b293#e209c2b174720e087f4fb93407def204adf4b293"
+source = "git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197#e79b5d2787b5449290be7ea7d2d97a6fccca3197"
 dependencies = [
  "sea-schema",
 ]
@@ -3107,7 +3107,7 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 [[package]]
 name = "senseicore"
 version = "0.1.0"
-source = "git+https://github.com/L2-Technology/sensei?rev=e209c2b174720e087f4fb93407def204adf4b293#e209c2b174720e087f4fb93407def204adf4b293"
+source = "git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197#e79b5d2787b5449290be7ea7d2d97a6fccca3197"
 dependencies = [
  "base32",
  "base64 0.13.0",
@@ -3118,7 +3118,7 @@ dependencies = [
  "bitcoincore-rpc",
  "chrono",
  "dirs 4.0.0",
- "entity 0.1.0 (git+https://github.com/L2-Technology/sensei?rev=e209c2b174720e087f4fb93407def204adf4b293)",
+ "entity 0.1.0 (git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197)",
  "futures",
  "hyper",
  "lightning 0.0.110",
@@ -3130,7 +3130,7 @@ dependencies = [
  "lightning-rapid-gossip-sync",
  "log",
  "macaroon",
- "migration 0.1.0 (git+https://github.com/L2-Technology/sensei?rev=e209c2b174720e087f4fb93407def204adf4b293)",
+ "migration 0.1.0 (git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197)",
  "pin-project",
  "public-ip",
  "rand 0.8.5",
