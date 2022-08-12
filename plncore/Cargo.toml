@@ -46,7 +46,7 @@ rust-embed="6.3.0"
 mime_guess = { version = "2" }
 entity = { path = "../entity" }
 migration = { path = "../migration" }
-senseicore = { git = "https://github.com/L2-Technology/sensei", rev = "e79b5d2787b5449290be7ea7d2d97a6fccca3197" }
+senseicore = { git = "https://github.com/L2-Technology/sensei", rev = "bb197d0a81533e17f1f3be1f020c8acc218436ae" }
 
 [dev-dependencies]
 bitcoind = { version = "0.26", features = [ "22_0" ] }

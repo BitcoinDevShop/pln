@@ -72,15 +72,11 @@ pub struct Channel {
 #[derive(Clone)]
 pub struct ManagerService {
     pub admin_service: Arc<AdminService>,
-    pub root_node_pubkey: String,
 }
 
 impl ManagerService {
-    pub async fn new(admin_service: Arc<AdminService>, root_node_pubkey: String) -> Self {
-        Self {
-            admin_service,
-            root_node_pubkey,
-        }
+    pub fn new(admin_service: Arc<AdminService>) -> Self {
+        Self { admin_service }
     }
 }
 
@@ -118,32 +114,7 @@ impl From<migration::DbErr> for Error {
 impl ManagerService {
     pub async fn call(&self, request: ManagerRequest) -> Result<ManagerResponse, Error> {
         match request {
-            ManagerRequest::GetStatus {} => {
-                let root_node = self.admin_service.database.get_root_node().await.unwrap(); // TODO dont unwrap
-                match root_node {
-                    Some(_root_node) => {
-                        let pubkey_node = self
-                            .admin_service
-                            .database
-                            .get_node_by_pubkey(self.root_node_pubkey.as_str())
-                            .await
-                            .unwrap(); // TODO dont unwrap
-                        match pubkey_node {
-                            Some(_pubkey_node) => {
-                                let directory = self.admin_service.node_directory.lock().await;
-                                let node_running =
-                                    directory.contains_key(self.root_node_pubkey.as_str());
-
-                                Ok(ManagerResponse::GetStatus {
-                                    running: node_running,
-                                })
-                            }
-                            None => Ok(ManagerResponse::GetStatus { running: false }),
-                        }
-                    }
-                    None => Ok(ManagerResponse::GetStatus { running: false }),
-                }
-            }
+            ManagerRequest::GetStatus {} => Ok(ManagerResponse::GetStatus { running: false }),
             ManagerRequest::StartNodes {} => {
                 println!("Trying to start all nodes...");
                 let get_nodes_req = AdminRequest::ListNodes {

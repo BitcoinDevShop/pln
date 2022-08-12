@@ -339,6 +339,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bcrypt"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a7e7c93a3fb23b2fdde989b2c9ec4dd153063ec81f408507f84c090cd91c6641"
+dependencies = [
+ "base64 0.13.0",
+ "blowfish",
+ "getrandom 0.2.6",
+ "zeroize",
+]
+
+[[package]]
 name = "bdk"
 version = "0.19.0-dev"
 source = "git+https://github.com/bitcoindevkit/bdk?rev=fbd98b4c5a88a10f8dfc22b4c54187eba4d68afe#fbd98b4c5a88a10f8dfc22b4c54187eba4d68afe"
@@ -506,6 +518,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "blowfish"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e412e2cd0f2b2d93e02543ceae7917b3c70331573df19ee046bcbc35e45e87d7"
+dependencies = [
+ "byteorder",
+ "cipher",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -560,6 +582,16 @@ name = "chunked_transfer"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fff857943da45f546682664a79488be82e69e43c1a7a2307679ab9afb3a66d2e"
+
+[[package]]
+name = "cipher"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d1873270f8f7942c191139cb8a40fd228da6c3fd2fc376d7e92d47aa14aeb59e"
+dependencies = [
+ "crypto-common",
+ "inout",
+]
 
 [[package]]
 name = "clap"
@@ -981,7 +1013,7 @@ dependencies = [
 [[package]]
 name = "entity"
 version = "0.1.0"
-source = "git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197#e79b5d2787b5449290be7ea7d2d97a6fccca3197"
+source = "git+https://github.com/L2-Technology/sensei?rev=bb197d0a81533e17f1f3be1f020c8acc218436ae#bb197d0a81533e17f1f3be1f020c8acc218436ae"
 dependencies = [
  "bdk 0.19.0",
  "sea-orm",
@@ -1535,6 +1567,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "inout"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0c10553d664a4d0bcff9f4215d0aac67a639cc68ef660840afe309b807bc9f5"
+dependencies = [
+ "generic-array",
+]
+
+[[package]]
 name = "instant"
 version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1878,7 +1919,7 @@ dependencies = [
 [[package]]
 name = "migration"
 version = "0.1.0"
-source = "git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197#e79b5d2787b5449290be7ea7d2d97a6fccca3197"
+source = "git+https://github.com/L2-Technology/sensei?rev=bb197d0a81533e17f1f3be1f020c8acc218436ae#bb197d0a81533e17f1f3be1f020c8acc218436ae"
 dependencies = [
  "sea-schema",
 ]
@@ -2243,6 +2284,7 @@ dependencies = [
  "tower-cookies",
  "tower-http",
  "uuid",
+ "zeroize",
 ]
 
 [[package]]
@@ -2773,9 +2815,9 @@ dependencies = [
 
 [[package]]
 name = "rsa"
-version = "0.4.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b0aeddcca1082112a6eeb43bf25fd7820b066aaf6eaef776e19d0a1febe38fe"
+checksum = "68ef841a26fc5d040ced0417c6c6a64ee851f42489df11cdf0218e545b6f8d28"
 dependencies = [
  "byteorder",
  "digest 0.9.0",
@@ -3107,10 +3149,11 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 [[package]]
 name = "senseicore"
 version = "0.1.0"
-source = "git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197#e79b5d2787b5449290be7ea7d2d97a6fccca3197"
+source = "git+https://github.com/L2-Technology/sensei?rev=bb197d0a81533e17f1f3be1f020c8acc218436ae#bb197d0a81533e17f1f3be1f020c8acc218436ae"
 dependencies = [
  "base32",
  "base64 0.13.0",
+ "bcrypt",
  "bdk 0.19.0",
  "bech32",
  "bitcoin",
@@ -3118,7 +3161,7 @@ dependencies = [
  "bitcoincore-rpc",
  "chrono",
  "dirs 4.0.0",
- "entity 0.1.0 (git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197)",
+ "entity 0.1.0 (git+https://github.com/L2-Technology/sensei?rev=bb197d0a81533e17f1f3be1f020c8acc218436ae)",
  "futures",
  "hyper",
  "lightning 0.0.110",
@@ -3130,7 +3173,7 @@ dependencies = [
  "lightning-rapid-gossip-sync",
  "log",
  "macaroon",
- "migration 0.1.0 (git+https://github.com/L2-Technology/sensei?rev=e79b5d2787b5449290be7ea7d2d97a6fccca3197)",
+ "migration 0.1.0 (git+https://github.com/L2-Technology/sensei?rev=bb197d0a81533e17f1f3be1f020c8acc218436ae)",
  "pin-project",
  "public-ip",
  "rand 0.8.5",
@@ -4550,9 +4593,9 @@ dependencies = [
 
 [[package]]
 name = "zeroize"
-version = "1.3.0"
+version = "1.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4756f7db3f7b5574938c3eb1c117038b8e07f95ee6718c0efad4ac21508f1efd"
+checksum = "c394b5bd0c6f669e7275d9c20aa90ae064cb22e75a1cad54e1b34088034b149f"
 dependencies = [
  "zeroize_derive",
 ]
