@@ -15,11 +15,12 @@ lightning-invoice = { version = "0.14.0", git = "https://github.com/lightningdev
 lightning-net-tokio = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
 lightning-persister = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
 lightning-background-processor = { version = "0.0.106", git = "https://github.com/lightningdevkit/rust-lightning", rev = "08ab6581f1c6254a7765340c5c7a553db58d3a89" }
-senseicore = { git = "https://github.com/L2-Technology/sensei", rev = "e79b5d2787b5449290be7ea7d2d97a6fccca3197" }
+senseicore = { git = "https://github.com/L2-Technology/sensei", rev = "bb197d0a81533e17f1f3be1f020c8acc218436ae" }
 base64 = "0.13.0"
 signal-hook = "0.3.14"
 bitcoin = "0.28.1"
 bitcoin-bech32 = "0.12"
+zeroize = "1.5.7"
 bech32 = "0.8"
 futures = "0.3"
 chrono = "0.4"

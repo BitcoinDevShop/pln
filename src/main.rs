@@ -225,61 +225,7 @@ fn main() -> Result<()> {
             .await,
         );
 
-        // get a root node if already created
-        let get_node_req = if let Ok(resp) = admin_service
-            .call(AdminRequest::StartAdmin {
-                passphrase: String::from("password"),
-            })
-            .await
-        {
-            let found_node = if let AdminResponse::StartAdmin {
-                pubkey,
-                macaroon: _,
-                token: _,
-            } = resp
-            {
-                let directory = admin_service.node_directory.lock().await;
-                let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
-                Some(handle.node.clone())
-            } else {
-                None
-            };
-            found_node
-        } else {
-            None
-        };
-
-        // Create a node if we do not have one already
-        let root_node = if let Some(node) = get_node_req {
-            node
-        } else {
-            let new_node = if let Ok(AdminResponse::CreateAdmin {
-                pubkey,
-                macaroon: _,
-                id: _,
-                token: _,
-                role: _,
-            }) = admin_service
-                .call(AdminRequest::CreateAdmin {
-                    username: String::from("root"),
-                    alias: String::from("root"),
-                    passphrase: String::from("password"),
-                    start: true,
-                })
-                .await
-            {
-                let directory = admin_service.node_directory.lock().await;
-                let handle = directory.get(&pubkey).unwrap().as_ref().unwrap();
-                Some(handle.node.clone())
-            } else {
-                None
-            }
-            .unwrap();
-            new_node
-        };
-
-        let manager_service =
-            Arc::new(ManagerService::new(admin_service.clone(), root_node.get_pubkey()).await);
+        let manager_service = Arc::new(ManagerService::new(admin_service.clone()));
 
         // lets check if the node is running
         let status_res = manager_service
@@ -292,8 +238,7 @@ fn main() -> Result<()> {
             _ => false,
         };
 
-        // got a root node!
-        println!("root node: {}, running: {}", root_node.get_pubkey(), status);
+        println!("running: {}", status);
 
         // now start any nodes we have in our db
         let _start_res = manager_service
