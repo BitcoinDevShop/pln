@@ -33,6 +33,22 @@ cargo build --release
 
 The binary is built to `target/release/pln`.
 
+### Docker
+
+There is a Docker container pre-built that can be used to run this instead.
+
+```shell
+# pull it!
+docker pull ghcr.io/BitcoinDevShop/pln:v0.0.1
+```
+
+If you want to build the Docker image locally:
+
+```shell
+# build it!
+docker build -t BitcoinDevShop/pln .
+```
+
 ## Running Rust backend
 
 Tony
