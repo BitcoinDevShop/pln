@@ -37,7 +37,7 @@ class BlandTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         expands: false,
-        // style: TextStyle(fontSize: 20.0, color: Colors.black45),
+        style: const TextStyle(fontSize: 20.0, color: black),
         decoration: InputDecoration(
           // contentPadding: EdgeInsets.all(12.0),
           prefixIcon: iconData != null

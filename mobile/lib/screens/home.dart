@@ -51,8 +51,7 @@ class Home extends ConsumerWidget {
       ref.refresh(balanceStreamProvider);
     }
 
-    return SafeArea(
-        child: Container(
+    return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -63,67 +62,69 @@ class Home extends ConsumerWidget {
           ],
         ),
       ),
-      child: Scaffold(
-          appBar: const PlnAppBar(
-            title: "Mutiny",
-            home: true,
-          ),
-          backgroundColor: Colors.transparent,
-          body: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    spacer12,
-                    state.when(
-                        data: (balance) => GestureDetector(
-                            onTap: _refresh,
-                            child: balance != null
-                                ? Balance(balance)
-                                : const Text("no connection")),
-                        loading: () => const CircularProgressIndicator(),
-                        error: (err, _) => Text(err.toString())),
-                    state.when(
-                      data: (balance) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlandButton(
-                              disabled: balance == null,
-                              text: "SEND",
-                              green: true,
-                              onPressed: () => context.go("/send")),
-                          spacer12,
-                          BlandButton(
-                              disabled: balance == null,
-                              text: "DEPOSIT",
-                              blue: true,
-                              onPressed: () => context.go("/receive")),
-                        ],
-                      ),
-                      loading: () => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlandButton(
+      child: SafeArea(
+        child: Scaffold(
+            appBar: const PlnAppBar(
+              title: "Mutiny",
+              home: true,
+            ),
+            backgroundColor: Colors.transparent,
+            body: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      spacer12,
+                      state.when(
+                          data: (balance) => GestureDetector(
+                              onTap: _refresh,
+                              child: balance != null
+                                  ? Balance(balance)
+                                  : const Text("no connection")),
+                          loading: () => const CircularProgressIndicator(),
+                          error: (err, _) => Text(err.toString())),
+                      state.when(
+                        data: (balance) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            BlandButton(
+                                disabled: balance == null,
+                                text: "SEND",
+                                green: true,
+                                onPressed: () => context.go("/send")),
+                            spacer12,
+                            BlandButton(
+                                disabled: balance == null,
+                                text: "DEPOSIT",
+                                blue: true,
+                                onPressed: () => context.go("/receive")),
+                          ],
+                        ),
+                        loading: () => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            BlandButton(
+                                disabled: true,
+                                text: "Send",
+                                onPressed: () => context.go("/send")),
+                            const SizedBox(height: 12),
+                            BlandButton(
+                                disabled: true,
+                                text: "Receive",
+                                onPressed: () => context.go("/receive")),
+                            const SizedBox(height: 12),
+                            BlandButton(
                               disabled: true,
-                              text: "Send",
-                              onPressed: () => context.go("/send")),
-                          const SizedBox(height: 12),
-                          BlandButton(
-                              disabled: true,
-                              text: "Receive",
-                              onPressed: () => context.go("/receive")),
-                          const SizedBox(height: 12),
-                          BlandButton(
-                            disabled: true,
-                            text: "Open Channel",
-                            onPressed: () => context.go("/channel"),
-                          )
-                        ],
-                      ),
-                      error: (err, _) => const SizedBox(height: 0),
-                    )
-                  ]))),
-    ));
+                              text: "Open Channel",
+                              onPressed: () => context.go("/channel"),
+                            )
+                          ],
+                        ),
+                        error: (err, _) => const SizedBox(height: 0),
+                      )
+                    ]))),
+      ),
+    );
   }
 }

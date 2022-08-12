@@ -1,13 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pln/data/channel.dart';
-import 'package:pln/generated/pln.pbgrpc.dart';
-import 'package:pln/grpc.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/key_value.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 final channelStatusStreamProvider = StreamProvider.autoDispose<String?>((ref) {
   Stream<String?> getStatus() async* {
