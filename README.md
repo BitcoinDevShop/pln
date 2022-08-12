@@ -16,6 +16,23 @@ Here's our hackathon presentation: [slides](https://github.com/BitcoinDevShop/pl
 
 <img width="702" alt="Screen Shot 2022-06-13 at 10 12 12 AM" src="https://user-images.githubusercontent.com/543668/173408613-aebf32e3-d751-4c50-80c9-1125b1fc61ec.png">
 
+## Deployment
+
+- [Docker](#docker)
+- [Source](#source)
+
+### Source
+
+To build from source, download the most recent source code and build it with `cargo`.
+
+```shell
+git clone https://github.com/BitcoinDevShop/pln.git
+cd pln
+cargo build --release
+```
+
+The binary is built to `target/release/pln`.
+
 ## Running Rust backend
 
 Tony

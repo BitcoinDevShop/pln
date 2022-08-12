@@ -1,0 +1,42 @@
+services:
+  pln-backend:
+    depends_on:
+    - bitcoind
+    build:
+      context: '.'
+    environment:
+      BITCOIND_RPC_HOST: bitcoind
+      BITCOIND_RPC_PASSWORD: '123'
+      BITCOIND_RPC_PORT: '18443'
+      BITCOIND_RPC_USERNAME: admin1
+      DATA_DIR: /mnt/ln-data
+      DEVELOPMENT_MODE: 'true'
+      NETWORK: regtest
+    volumes:
+    - .local/ln_datae:/mnt/ln-data
+
+  bitcoind:
+    image: ghcr.io/vulpemventures/bitcoin:latest
+    user: 0:0
+    command:
+    - -datadir=/mnt/data
+    - -regtest=1
+    - -dnsseed=0
+    - -upnp=0
+    - -port=18444
+    - -rpcport=18443
+    - -server=1
+    - -txindex=1
+    - -rpcuser=admin1
+    - -rpcpassword=123
+    - -rpcallowip=0.0.0.0/0
+    - -rpcbind=0.0.0.0
+    - -fallbackfee=0.00001
+    - -blockfilterindex=1
+    - -peerblockfilters=1
+    ports:
+    - 18443:18443
+    - 18444:18444
+    volumes:
+    - .local/regtest:/mnt/data
+    restart: unless-stopped
