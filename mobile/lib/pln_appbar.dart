@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'constants.dart';
-
 class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final void Function()? backAction;
@@ -32,11 +30,7 @@ class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
           home
               ? GestureDetector(
                   onTap: () => context.go("/welcome"),
-                  child: Text(title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline1
-                          ?.copyWith(color: blue)),
+                  child: Image.asset("images/mutiny_logo.png", height: 25),
                 )
               : Text(title, style: Theme.of(context).textTheme.headline1),
           backAction != null

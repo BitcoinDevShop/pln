@@ -14,14 +14,14 @@ class Balance extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.ideographic,
       children: [
-        Text(f.format(amountSats),
+        Text(f.format(amountSats).replaceAll(',', '_'),
             style: Theme.of(context).textTheme.headline2),
-        const Text(" sats",
+        const Text(" SATS",
             style: TextStyle(
-                fontFamily: "Inter",
-                color: black,
+                fontFamily: "Yantramanav",
+                color: white,
                 fontSize: 24,
-                fontWeight: FontWeight.w400)),
+                fontWeight: FontWeight.w300)),
       ],
     );
   }

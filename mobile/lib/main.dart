@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pln/constants.dart';
 import 'package:pln/data/prefs.dart';
 import 'package:pln/router.dart';
 import 'package:pln/theme.dart';
@@ -29,21 +30,21 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
-      title: "pLN",
+      title: "Mutiny",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          // brightness: Brightness.light,
-          primaryColor: Colors.black,
-          primarySwatch: materialBlack,
+          brightness: Brightness.dark,
+          primaryColor: Colors.white,
+          primarySwatch: materialWhite,
           textTheme: blandTextTheme,
-          backgroundColor: Colors.white,
-          scaffoldBackgroundColor: Colors.white,
-          fontFamily: "Inter"),
+          backgroundColor: black,
+          scaffoldBackgroundColor: darkblueEnd,
+          fontFamily: "Yantramanav"),
     );
   }
 }
 
-MaterialColor materialBlack = createMaterialColor(Colors.black);
+MaterialColor materialWhite = createMaterialColor(white);
 
 MaterialColor createMaterialColor(Color color) {
   List strengths = <double>[.05];
