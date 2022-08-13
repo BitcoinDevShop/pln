@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pln/constants.dart';
 import 'package:pln/data/send.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
@@ -42,6 +43,7 @@ class SendStatus extends ConsumerWidget {
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
+                accentColor: green,
                 title: send?.sendStatus == "good" ? "Sent!" : "Sending...",
                 closeAction: _close),
             body: Padding(

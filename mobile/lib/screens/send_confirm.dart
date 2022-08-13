@@ -25,7 +25,9 @@ class SendConfirm extends ConsumerWidget {
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "Confirm Send", closeAction: () => context.go("/")),
+                accentColor: green,
+                title: "Confirm Send",
+                closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(

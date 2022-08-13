@@ -4,16 +4,17 @@ import 'constants.dart';
 
 const TextTheme blandTextTheme = TextTheme(
   headline1: TextStyle(
-    fontFamily: "Yantramanav",
-    color: white,
-    fontSize: 22,
-    fontWeight: FontWeight.w300,
-  ),
+      fontFamily: "Yantramanav",
+      color: white,
+      fontSize: 28,
+      fontWeight: FontWeight.w300,
+      letterSpacing: -0.32),
   headline2: TextStyle(
       fontFamily: "Yantramanav",
       color: white,
-      fontSize: 44,
-      fontWeight: FontWeight.w300),
+      fontSize: 22,
+      fontWeight: FontWeight.w300,
+      letterSpacing: -0.32),
   // Buttons
   headline3: TextStyle(
     fontFamily: "Yantramanav",
@@ -50,15 +51,16 @@ const TextTheme blandTextTheme = TextTheme(
     fontFamily: "Yantramanav",
     color: white,
     fontSize: 16,
+    fontWeight: FontWeight.w300,
   ),
   subtitle2: TextStyle(
     fontFamily: "Yantramanav",
-    color: white,
+    backgroundColor: white,
     fontSize: 16,
   ),
   caption: TextStyle(
     fontFamily: "Yantramanav",
-    color: white,
+    backgroundColor: white,
     fontSize: 16,
   ),
 );

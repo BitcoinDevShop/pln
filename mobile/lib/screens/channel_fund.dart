@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pln/constants.dart';
 import 'package:pln/data/channel.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
@@ -20,7 +21,9 @@ class ChannelFund extends ConsumerWidget {
     return SafeArea(
         child: Scaffold(
             appBar: PlnAppBar(
-                title: "Fund Channel", closeAction: () => context.go("/")),
+                accentColor: blue,
+                title: "Fund Channel",
+                closeAction: () => context.go("/")),
             body: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(

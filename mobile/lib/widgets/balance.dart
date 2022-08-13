@@ -15,7 +15,7 @@ class Balance extends StatelessWidget {
       textBaseline: TextBaseline.ideographic,
       children: [
         Text(f.format(amountSats).replaceAll(',', '_'),
-            style: Theme.of(context).textTheme.headline2),
+            style: const TextStyle(fontSize: 44, fontWeight: FontWeight.w300)),
         const Text(" SATS",
             style: TextStyle(
                 fontFamily: "Yantramanav",

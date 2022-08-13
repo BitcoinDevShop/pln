@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pln/constants.dart';
 import 'package:pln/data/send.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:pln/widgets/super_safe_area.dart';
 import 'package:pln/widgets/text_field.dart';
 
 class SendScreen extends ConsumerWidget {
@@ -27,33 +29,33 @@ class SendScreen extends ConsumerWidget {
       }
     }
 
-    return SafeArea(
-        child: Scaffold(
-            appBar:
-                PlnAppBar(title: "Send", closeAction: () => context.go("/")),
-            body: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24.0),
-                      BlandTextField(
-                        controller: invoiceTextController,
-                        prompt: "Paste Invoice",
-                        iconData: Icons.qr_code,
-                      ),
-                      const SizedBox(height: 0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlandButton(
-                              text: "Continue",
-                              onPressed: () async {
-                                await _create();
-                              }),
-                        ],
-                      )
-                    ]))));
+    return SuperSafeArea(
+        appBar: PlnAppBar(
+            accentColor: green,
+            title: "SEND",
+            closeAction: () => context.go("/")),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24.0),
+              BlandTextField(
+                accentColor: green,
+                controller: invoiceTextController,
+                prompt: "Paste Invoice",
+                iconData: Icons.qr_code,
+              ),
+              const SizedBox(height: 0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BlandButton(
+                      text: "CONTINUE",
+                      onPressed: () async {
+                        await _create();
+                      }),
+                ],
+              )
+            ]));
   }
 }

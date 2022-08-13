@@ -6,7 +6,7 @@ import 'package:pln/main.dart';
 import 'package:pln/screens/channel_status.dart';
 import 'package:pln/screens/welcome.dart';
 
-import './screens/channel.dart';
+import 'screens/deposit.dart';
 import 'screens/channel_fund.dart';
 import 'screens/home.dart';
 import 'screens/receive.dart';
@@ -60,7 +60,7 @@ class RouterNotifier extends ChangeNotifier {
               path: "receive", builder: (context, state) => const Receive()),
           GoRoute(
               path: "channel",
-              builder: (context, state) => const ChannelScreen(),
+              builder: (context, state) => const DepositScreen(),
               routes: [
                 GoRoute(
                     path: "fund",
