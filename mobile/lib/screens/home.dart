@@ -68,7 +68,7 @@ class Home extends ConsumerWidget {
                       onTap: _refresh,
                       child: balance != null
                           ? Balance(balance)
-                          : const Text("no connection")),
+                          : const Text("fuck tony")),
                   loading: () => const CircularProgressIndicator(),
                   error: (err, _) => Text(err.toString())),
               state.when(
