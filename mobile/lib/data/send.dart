@@ -44,6 +44,8 @@ class SendNotifier extends StateNotifier<Send?> {
   final Ref ref;
 
   createSendFromInvoice(String invoice) async {
+    invoice.replaceAll("lightning:", "");
+
     final req = Bolt11PaymentRequest(invoice);
     debugPrint("amount: ${(req.amount.toDouble() * 100000000).toInt()}");
 

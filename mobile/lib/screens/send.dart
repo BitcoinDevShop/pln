@@ -5,8 +5,10 @@ import 'package:pln/data/send.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:pln/widgets/qr_scanner.dart';
 import 'package:pln/widgets/super_safe_area.dart';
 import 'package:pln/widgets/text_field.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class SendScreen extends ConsumerWidget {
   const SendScreen({Key? key}) : super(key: key);
@@ -15,6 +17,26 @@ class SendScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final invoiceTextController = TextEditingController();
     final sendNotifier = ref.read(sendProvider.notifier);
+
+    Future<void> tryDecode(String data) async {
+      try {
+        await sendNotifier.createSendFromInvoice(data).then((_) {
+          debugPrint("creating... $data");
+          context.go("/send/confirm");
+        });
+      } catch (err) {
+        context.go("/errormodal", extra: err);
+      }
+    }
+
+    // TODO is it right that I'm defining the function in here?
+    void onDetect(Barcode barcode) async {
+      final data = barcode.code;
+      if (data != null) {
+        debugPrint('Barcode found! $data');
+        await tryDecode(data.trim());
+      }
+    }
 
     _create() async {
       try {
@@ -38,14 +60,19 @@ class SendScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 24.0),
+              Expanded(
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: QRViewExample(onDetect: onDetect)),
+              ),
+              spacer24,
               BlandTextField(
                 accentColor: green,
                 controller: invoiceTextController,
                 prompt: "Paste Invoice",
                 iconData: Icons.qr_code,
               ),
-              const SizedBox(height: 0),
+              spacer24,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
