@@ -6,6 +6,7 @@ import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/key_value.dart';
+import 'package:pln/widgets/super_safe_area.dart';
 
 final sendStatusStreamProvider = StreamProvider.autoDispose<String?>((ref) {
   Stream<String?> getStatus() async* {
@@ -40,46 +41,42 @@ class SendStatus extends ConsumerWidget {
       context.go("/");
     }
 
-    return SafeArea(
-        child: Scaffold(
-            appBar: PlnAppBar(
-                accentColor: green,
-                title: send?.sendStatus == "good" ? "Sent!" : "Sending...",
-                closeAction: _close),
-            body: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          KeyValue(
-                            k: "Send Status",
-                            vw: statusProvider.when(
-                                data: (data) => Text(
-                                    data ?? "no status something went wrong?"),
-                                loading: () => const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                error: (err, _) => Text(err.toString())),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlandButton(
-                            text:
-                                send?.sendStatus == "good" ? "Nice" : "Give Up",
-                            onPressed: _close,
-                          )
-                        ],
-                      )
-                    ]))));
+    return SuperSafeArea(
+        appBar: PlnAppBar(
+            accentColor: green,
+            title: send?.sendStatus == "good" ? "SENT!" : "SENDING...",
+            closeAction: _close),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  KeyValue(
+                    k: "Send Status",
+                    vw: statusProvider.when(
+                        data: (data) =>
+                            Text(data ?? "no status something went wrong?"),
+                        loading: () => const Padding(
+                              padding: EdgeInsets.all(4.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                        error: (err, _) => Text(err.toString())),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BlandButton(
+                    text: send?.sendStatus == "good" ? "Nice" : "Give Up",
+                    onPressed: _close,
+                  )
+                ],
+              )
+            ]));
   }
 }

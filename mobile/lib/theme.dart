@@ -27,11 +27,12 @@ const TextTheme blandTextTheme = TextTheme(
     color: white,
     fontSize: 16,
   ),
+  // KV header
   headline5: TextStyle(
-    fontFamily: "Yantramanav",
-    color: white,
-    fontSize: 16,
-  ),
+      fontFamily: "Yantramanav",
+      color: white,
+      fontSize: 16,
+      fontWeight: FontWeight.w900),
   headline6: TextStyle(
       fontFamily: "Yantramanav",
       color: white,

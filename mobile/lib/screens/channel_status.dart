@@ -6,6 +6,7 @@ import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/key_value.dart';
+import 'package:pln/widgets/super_safe_area.dart';
 
 final channelStatusStreamProvider = StreamProvider.autoDispose<String?>((ref) {
   Stream<String?> getStatus() async* {
@@ -35,47 +36,44 @@ class ChannelStatus extends ConsumerWidget {
     final channelNotifier = ref.read(channelProvider.notifier);
     final channelStreamProvider = ref.watch(channelStatusStreamProvider);
 
-    return SafeArea(
-        child: Scaffold(
-            appBar: PlnAppBar(
-                accentColor: blue,
-                title: channel?.status == "good"
-                    ? "Channel Opened!"
-                    : "Opening Channel...",
-                closeAction: () => context.go("/")),
-            body: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24),
-                      // Text(chann?.status ?? "..."),
-                      KeyValue(
-                          k: "Channel Open Status",
-                          vw: channelStreamProvider.when(
-                              data: (data) => Text(
-                                  data ?? "no status something went wrong?"),
-                              loading: () => const Padding(
-                                    padding: EdgeInsets.all(4.0),
-                                    child: CircularProgressIndicator(),
-                                  ),
-                              error: (err, _) => Text(err.toString()))),
-                      const SizedBox(height: 0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlandButton(
-                            text: channel?.status == "good"
-                                ? "Nice"
-                                : "Let me go home this is boring",
-                            onPressed: () {
-                              channelNotifier.clear();
-                              context.go("/");
-                            },
-                          )
-                        ],
-                      )
-                    ]))));
+    return SuperSafeArea(
+        appBar: PlnAppBar(
+            accentColor: blue,
+            title: channel?.status == "good"
+                ? "CHANNEL OPENED!"
+                : "OPENING CHANNEL...",
+            closeAction: () => context.go("/")),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              // Text(chann?.status ?? "..."),
+              KeyValue(
+                  k: "Channel Open Status",
+                  vw: channelStreamProvider.when(
+                      data: (data) =>
+                          Text(data ?? "no status something went wrong?"),
+                      loading: () => const Padding(
+                            padding: EdgeInsets.all(4.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                      error: (err, _) => Text(err.toString()))),
+              const SizedBox(height: 0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BlandButton(
+                    text: channel?.status == "good"
+                        ? "Nice"
+                        : "Let me go home this is boring",
+                    onPressed: () {
+                      channelNotifier.clear();
+                      context.go("/");
+                    },
+                  )
+                ],
+              )
+            ]));
   }
 }

@@ -4,6 +4,7 @@ import 'package:pln/constants.dart';
 import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:pln/widgets/super_safe_area.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final Uri _url = Uri.parse('https://abytesjourney.com/lightning-privacy/');
@@ -17,34 +18,29 @@ class Receive extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SafeArea(
-        child: Scaffold(
-            appBar: PlnAppBar(
-                accentColor: red,
-                title: "Receive",
-                closeAction: () => context.go("/")),
-            body: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24.0),
-                      Expanded(
-                          child: GestureDetector(
-                        onLongPress: _launchUrl,
-                        child: Image.asset("images/no-receive.png",
-                            fit: BoxFit.cover),
-                      )),
-                      const SizedBox(height: 48),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlandButton(
-                              text: "Okay...",
-                              onPressed: () => context.go("/")),
-                        ],
-                      )
-                    ]))));
+    return SuperSafeArea(
+        appBar: PlnAppBar(
+            accentColor: red,
+            title: "RECEIVE",
+            closeAction: () => context.go("/")),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24.0),
+              Expanded(
+                  child: GestureDetector(
+                onLongPress: _launchUrl,
+                child: Image.asset("images/no-receive.png", fit: BoxFit.cover),
+              )),
+              const SizedBox(height: 48),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BlandButton(
+                      text: "Okay...", onPressed: () => context.go("/")),
+                ],
+              )
+            ]));
   }
 }

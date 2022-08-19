@@ -97,6 +97,8 @@ flutter:
           weight: 300
         - asset: fonts/Yantramanav-Regular.ttf
           weight: 400
+        - asset: fonts/Yantramanav-Black.ttf
+          weight: 900
   # fonts:
   #   - family: Schyler
   #     fonts:
