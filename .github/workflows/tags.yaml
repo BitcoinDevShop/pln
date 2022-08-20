@@ -1,0 +1,16 @@
+name: Tags
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  docker_build:
+    uses: ./.github/workflows/docker_build.yaml
+    with:
+      repo: ${{ github.repository }}
+      version: ${{ github.ref }}
+      docker_registry: ghcr.io
+    secrets:
+      DOCKER_USER: ${{ github.actor }}
+      DOCKER_PASS: ${{ secrets.GITHUB_TOKEN }}
