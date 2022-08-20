@@ -5,6 +5,7 @@ import 'package:pln/pln_appbar.dart';
 import 'package:pln/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:pln/widgets/key_value.dart';
+import 'package:pln/widgets/super_safe_area.dart';
 
 import '../constants.dart';
 
@@ -22,51 +23,40 @@ class SendConfirm extends ConsumerWidget {
       });
     }
 
-    return SafeArea(
-        child: Scaffold(
-            appBar: PlnAppBar(
-                title: "Confirm Send", closeAction: () => context.go("/")),
-            body: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          KeyValue(
-                              k: "Amount",
-                              v: send?.amountSats != null
-                                  ? "${send?.amountSats} sats"
-                                  : ""),
-                          const SizedBox(height: 12),
-                          KeyValue(
-                              k: "Invoice",
-                              v: send?.invoice ?? "no invoice..."),
-                          const SizedBox(height: 12),
-                          KeyValue(
-                              k: "Memo", v: send?.description ?? "For drugs"),
-                          const SizedBox(height: 12),
-                          Container(
-                              color: lime,
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text("Memos can be bad sometimes!"),
-                              ))
-                        ],
-                      ),
-                      const SizedBox(height: 0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlandButton(
-                            text: "Send",
-                            onPressed: _sendPayment,
-                          )
-                        ],
-                      )
-                    ]))));
+    return SuperSafeArea(
+        appBar: PlnAppBar(
+            accentColor: green,
+            title: "CONFIRM SEND",
+            closeAction: () => context.go("/")),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const KeyValue(k: "WHO", v: "satoshis.place"),
+                  spacer12,
+                  KeyValue(
+                      k: "HOW MUCH",
+                      v: send?.amountSats != null
+                          ? "${send?.amountSats} sats"
+                          : ""),
+                  spacer12,
+                  KeyValue(k: "INVOICE", v: send?.invoice ?? "no invoice..."),
+                  spacer12,
+                  KeyValue(k: "WHAT FOR", v: send?.description ?? "For drugs"),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BlandButton(
+                    text: "Send",
+                    onPressed: _sendPayment,
+                  )
+                ],
+              )
+            ]));
   }
 }

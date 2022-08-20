@@ -20,7 +20,9 @@ class PlnClient extends StateNotifier<ManagerClient?> {
     try {
       final prefs = ref.read(prefProvider);
 
-      final uri = Uri.parse(prefs ?? "http://localhost:5401");
+      // final uri = Uri.parse(prefs ?? "http://localhost:5401");
+      // final uri = Uri.parse("http://localhost:5401");
+      final uri = Uri.parse(prefs ?? "http://100.88.248.88:5401");
 
       // TODO is this all I need from the URI?
       final channel = ClientChannel(uri.host + uri.path,

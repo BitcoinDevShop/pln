@@ -74,20 +74,17 @@ The GRPC should run on `5401`
 Follow the relevant instructions for running a Flutter app from your IDE (this is nice because you get better debugging and hot reload).
 
 If you want to run from the terminal, enter the `/mobile` dir and run one of these:
-`flutter -d macos` for Mac
-`flutter -d linux` for Linux
-`flutter -d <device id>` for an iOS or Android simulator (list available simulators via `flutter devices`)
+`flutter run -d macos` for Mac
+`flutter run -d linux` for Linux
+`flutter run -d <device id>` for an iOS or Android simulator (list available simulators via `flutter devices`)
 
 ## regen protobuf stuff for flutter:
 
 (from mobile dir):
 
 ```
-pub global activate protoc_plugin
+flutter pub global activate protoc_plugin
 export PATH="$PATH":"$HOME/resources_for_dev/flutter/.pub-cache/bin"
-```
-
-```
 protoc -I. -I../proto --dart_out=grpc:lib/generated ../proto/pln.proto
 ```
 

@@ -68,6 +68,38 @@ const GetChannelResponse$json = const {
 
 /// Descriptor for `GetChannelResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getChannelResponseDescriptor = $convert.base64Decode('ChJHZXRDaGFubmVsUmVzcG9uc2USFgoGc3RhdHVzGAEgASgJUgZzdGF0dXM=');
+@$core.Deprecated('Use channelDescriptor instead')
+const Channel$json = const {
+  '1': 'Channel',
+  '2': const [
+    const {'1': 'node_alias', '3': 1, '4': 1, '5': 9, '10': 'nodeAlias'},
+    const {'1': 'total_amt_satoshis', '3': 2, '4': 1, '5': 4, '10': 'totalAmtSatoshis'},
+    const {'1': 'balance_amt_satoshis', '3': 3, '4': 1, '5': 4, '10': 'balanceAmtSatoshis'},
+  ],
+};
+
+/// Descriptor for `Channel`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List channelDescriptor = $convert.base64Decode('CgdDaGFubmVsEh0KCm5vZGVfYWxpYXMYASABKAlSCW5vZGVBbGlhcxIsChJ0b3RhbF9hbXRfc2F0b3NoaXMYAiABKARSEHRvdGFsQW10U2F0b3NoaXMSMAoUYmFsYW5jZV9hbXRfc2F0b3NoaXMYAyABKARSEmJhbGFuY2VBbXRTYXRvc2hpcw==');
+@$core.Deprecated('Use listChannelsRequestDescriptor instead')
+const ListChannelsRequest$json = const {
+  '1': 'ListChannelsRequest',
+  '2': const [
+    const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+  ],
+};
+
+/// Descriptor for `ListChannelsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listChannelsRequestDescriptor = $convert.base64Decode('ChNMaXN0Q2hhbm5lbHNSZXF1ZXN0Eg4KAmlkGAEgASgJUgJpZA==');
+@$core.Deprecated('Use listChannelsResponseDescriptor instead')
+const ListChannelsResponse$json = const {
+  '1': 'ListChannelsResponse',
+  '2': const [
+    const {'1': 'channels', '3': 1, '4': 3, '5': 11, '6': '.pln.Channel', '10': 'channels'},
+  ],
+};
+
+/// Descriptor for `ListChannelsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listChannelsResponseDescriptor = $convert.base64Decode('ChRMaXN0Q2hhbm5lbHNSZXNwb25zZRIoCghjaGFubmVscxgBIAMoCzIMLnBsbi5DaGFubmVsUghjaGFubmVscw==');
 @$core.Deprecated('Use sendPaymentRequestDescriptor instead')
 const SendPaymentRequest$json = const {
   '1': 'SendPaymentRequest',

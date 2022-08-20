@@ -44,6 +44,7 @@ dependencies:
   intl: ^0.17.0
   bolt11_decoder: ^1.0.1
   shared_preferences: ^2.0.15
+  qr_code_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:
@@ -91,6 +92,14 @@ flutter:
           weight: 400
         - asset: fonts/Inter-ExtraBold.ttf
           weight: 800
+    - family: Yantramanav
+      fonts:
+        - asset: fonts/Yantramanav-Light.ttf
+          weight: 300
+        - asset: fonts/Yantramanav-Regular.ttf
+          weight: 400
+        - asset: fonts/Yantramanav-Black.ttf
+          weight: 900
   # fonts:
   #   - family: Schyler
   #     fonts:

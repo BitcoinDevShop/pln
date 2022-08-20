@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'constants.dart';
+import 'package:pln/widgets/background_button.dart';
 
 class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final void Function()? backAction;
   final void Function()? closeAction;
   final bool home;
+  final Color accentColor;
 
   const PlnAppBar(
       {Key? key,
       required this.title,
       this.backAction,
       this.closeAction,
-      this.home = false})
+      this.home = false,
+      required this.accentColor})
       : super(key: key);
 
   @override
@@ -32,13 +33,18 @@ class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
           home
               ? GestureDetector(
                   onTap: () => context.go("/welcome"),
-                  child: Text(title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline1
-                          ?.copyWith(color: blue)),
+                  child: Image.asset("images/mutiny_logo.png", height: 25),
                 )
-              : Text(title, style: Theme.of(context).textTheme.headline1),
+              : Container(
+                  padding: const EdgeInsets.fromLTRB(0, 8.0, 8.0, 8.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(width: 2.0, color: accentColor),
+                    ),
+                  ),
+                  child:
+                      Text(title, style: Theme.of(context).textTheme.headline1),
+                ),
           backAction != null
               ? InkWell(
                   onTap: backAction,
@@ -52,15 +58,18 @@ class PlnAppBar extends StatelessWidget implements PreferredSizeWidget {
                   width: 24,
                 ),
           closeAction != null
-              ? InkWell(
-                  onTap: closeAction,
-                  child: Icon(
-                    Icons.close,
-                    color: Theme.of(context).primaryColor,
-                    size: 24.0,
-                    semanticLabel: 'Close',
-                  ),
-                )
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: BackgroundButton(
+                    accentColor: accentColor,
+                    onPressed: closeAction,
+                    child: Image.asset(
+                      height: 21,
+                      width: 21,
+                      "images/ex.png",
+                      filterQuality: FilterQuality.none,
+                    ),
+                  ))
               : const SizedBox(
                   width: 24,
                 ),

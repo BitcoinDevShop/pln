@@ -50,6 +50,12 @@ class ManagerClient extends $grpc.Client {
           ($0.GetBalanceRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) =>
               $0.GetBalanceResponse.fromBuffer(value));
+  static final _$listChannels =
+      $grpc.ClientMethod<$0.ListChannelsRequest, $0.ListChannelsResponse>(
+          '/pln.Manager/ListChannels',
+          ($0.ListChannelsRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) =>
+              $0.ListChannelsResponse.fromBuffer(value));
 
   ManagerClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -90,6 +96,12 @@ class ManagerClient extends $grpc.Client {
       $0.GetBalanceRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$getBalance, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.ListChannelsResponse> listChannels(
+      $0.ListChannelsRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$listChannels, request, options: options);
   }
 }
 
@@ -143,6 +155,15 @@ abstract class ManagerServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.GetBalanceRequest.fromBuffer(value),
         ($0.GetBalanceResponse value) => value.writeToBuffer()));
+    $addMethod(
+        $grpc.ServiceMethod<$0.ListChannelsRequest, $0.ListChannelsResponse>(
+            'ListChannels',
+            listChannels_Pre,
+            false,
+            false,
+            ($core.List<$core.int> value) =>
+                $0.ListChannelsRequest.fromBuffer(value),
+            ($0.ListChannelsResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.GetStatusResponse> getStatus_Pre($grpc.ServiceCall call,
@@ -175,6 +196,12 @@ abstract class ManagerServiceBase extends $grpc.Service {
     return getBalance(call, await request);
   }
 
+  $async.Future<$0.ListChannelsResponse> listChannels_Pre(
+      $grpc.ServiceCall call,
+      $async.Future<$0.ListChannelsRequest> request) async {
+    return listChannels(call, await request);
+  }
+
   $async.Future<$0.GetStatusResponse> getStatus(
       $grpc.ServiceCall call, $0.GetStatusRequest request);
   $async.Future<$0.OpenChannelResponse> openChannel(
@@ -187,4 +214,6 @@ abstract class ManagerServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $0.SendStatusRequest request);
   $async.Future<$0.GetBalanceResponse> getBalance(
       $grpc.ServiceCall call, $0.GetBalanceRequest request);
+  $async.Future<$0.ListChannelsResponse> listChannels(
+      $grpc.ServiceCall call, $0.ListChannelsRequest request);
 }

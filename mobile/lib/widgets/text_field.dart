@@ -2,18 +2,18 @@ import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:pln/constants.dart';
 
-// import 'constants.dart';
-
 class BlandTextField extends StatelessWidget {
   final String prompt;
   final IconData? iconData;
   final TextEditingController controller;
+  final Color accentColor;
 
   const BlandTextField({
     Key? key,
     required this.prompt,
     this.iconData,
     required this.controller,
+    required this.accentColor,
   }) : super(key: key);
 
   @override
@@ -23,21 +23,17 @@ class BlandTextField extends StatelessWidget {
         color: lightGray,
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              offset: const Offset(0.0, 2.0),
+              color: Colors.black.withOpacity(0.4),
+              offset: const Offset(4.0, 4.0),
               blurRadius: 3.0,
               inset: true),
-          BoxShadow(
-              color: Colors.white.withOpacity(0.5),
-              offset: const Offset(0.0, 2.0),
-              blurRadius: 3.0,
-              inset: true)
         ],
       ),
       child: TextField(
         controller: controller,
         expands: false,
-        // style: TextStyle(fontSize: 20.0, color: Colors.black45),
+        style: const TextStyle(fontSize: 20.0, color: black),
+        cursorColor: black,
         decoration: InputDecoration(
           // contentPadding: EdgeInsets.all(12.0),
           prefixIcon: iconData != null
@@ -47,13 +43,15 @@ class BlandTextField extends StatelessWidget {
                 )
               : null,
           hintText: prompt,
+          hintStyle:
+              const TextStyle(color: promptText, fontWeight: FontWeight.w300),
           // hintStyle: TextStyle(color: Colors.black54),
           focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: black),
+            borderSide: BorderSide(color: accentColor, width: 2.0),
             borderRadius: BorderRadius.circular(0.0),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: lightGray),
+            borderSide: BorderSide(color: accentColor, width: 2.0),
             borderRadius: BorderRadius.circular(0.0),
           ),
         ),
