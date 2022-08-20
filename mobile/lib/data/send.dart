@@ -44,9 +44,9 @@ class SendNotifier extends StateNotifier<Send?> {
   final Ref ref;
 
   createSendFromInvoice(String invoice) async {
-    invoice.replaceAll("lightning:", "");
+    final trimmed = invoice.replaceAll("lightning:", "");
 
-    final req = Bolt11PaymentRequest(invoice);
+    final req = Bolt11PaymentRequest(trimmed);
     debugPrint("amount: ${(req.amount.toDouble() * 100000000).toInt()}");
 
     var description = "";
@@ -57,7 +57,7 @@ class SendNotifier extends StateNotifier<Send?> {
       }
     }
     state = Send(
-        invoice: invoice,
+        invoice: trimmed,
         amountSats: btcToSats(req.amount),
         description: description);
   }
@@ -78,6 +78,7 @@ class SendNotifier extends StateNotifier<Send?> {
       state = state?.copyWith(sendStatus: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');
+      throw Exception(e.toString());
     }
   }
 
@@ -91,6 +92,7 @@ class SendNotifier extends StateNotifier<Send?> {
       state = state?.copyWith(sendStatus: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');
+      throw Exception(e.toString());
     }
   }
 

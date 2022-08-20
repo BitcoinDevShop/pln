@@ -24,8 +24,9 @@ class SendScreen extends ConsumerWidget {
           debugPrint("creating... $data");
           context.go("/send/confirm");
         });
-      } catch (err) {
-        context.go("/errormodal", extra: err);
+      } catch (e) {
+        debugPrint('Caught error: $e');
+        context.go("/errormodal", extra: e);
       }
     }
 
@@ -48,6 +49,7 @@ class SendScreen extends ConsumerWidget {
         });
       } catch (e) {
         debugPrint('Caught error: $e');
+        context.go("/errormodal", extra: e);
       }
     }
 

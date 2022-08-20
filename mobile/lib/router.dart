@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:pln/main.dart';
 import 'package:pln/screens/channel_status.dart';
+import 'package:pln/screens/error_page.dart';
 import 'package:pln/screens/welcome.dart';
 
 import 'screens/deposit.dart';
@@ -23,6 +23,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: router, // This notifiies `GoRouter` for refresh events
     redirect: router._redirectLogic, // All the logic is centralized here
     routes: router._routes, // All the routes can be found there
+    errorBuilder: (context, state) => ErrorPage(errorReason: state.error),
   );
 });
 
@@ -43,6 +44,13 @@ class RouterNotifier extends ChangeNotifier {
   }
 
   List<GoRoute> get _routes => [
+        GoRoute(
+            path: "/errormodal",
+            pageBuilder: (context, state) {
+              return MaterialPage(
+                  fullscreenDialog: true,
+                  child: ErrorPage(errorMessage: state.extra.toString()));
+            }),
         GoRoute(path: "/welcome", builder: (context, state) => const Welcome()),
         GoRoute(path: "/", builder: (context, state) => const Home(), routes: [
           GoRoute(

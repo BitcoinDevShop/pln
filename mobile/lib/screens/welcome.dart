@@ -34,6 +34,7 @@ class Welcome extends ConsumerWidget {
         });
       } catch (e) {
         debugPrint('Caught error: $e');
+        context.go("/errormodal", extra: e);
       }
     }
 

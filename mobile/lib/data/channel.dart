@@ -67,6 +67,7 @@ class ChannelNotifier extends StateNotifier<Channel?> {
           state?.copyWith(fundingAddress: response.address, id: response.id);
     } catch (e) {
       debugPrint('Caught error: $e');
+      throw Exception(e.toString());
     }
   }
 
@@ -79,6 +80,7 @@ class ChannelNotifier extends StateNotifier<Channel?> {
       state = state?.copyWith(status: response.status);
     } catch (e) {
       debugPrint('Caught error: $e');
+      throw Exception(e.toString());
     }
   }
 
@@ -91,7 +93,6 @@ class ChannelNotifier extends StateNotifier<Channel?> {
       } else {
         _timer?.cancel();
       }
-      ;
     });
   }
 
