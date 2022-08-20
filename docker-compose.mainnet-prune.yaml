@@ -2,8 +2,7 @@ services:
   pln-backend:
     depends_on:
     - bitcoind
-    build:
-      context: '.'
+    image: ghcr.io/BitcoinDevShop/pln:latest
     environment:
       BITCOIND_RPC_HOST: bitcoind
       BITCOIND_RPC_PASSWORD: '123'
