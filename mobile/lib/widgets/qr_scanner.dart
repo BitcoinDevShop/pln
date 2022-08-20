@@ -17,6 +17,9 @@ class _QRViewExampleState extends State<QRViewExample> {
   Barcode? result;
   QRViewController? controller;
 
+  // Debounce decoding please!
+  bool gotValidQR = false;
+
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
   @override
@@ -52,10 +55,17 @@ class _QRViewExampleState extends State<QRViewExample> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
+      // This doesn't work but wish it did!
+      if (gotValidQR) {
+        debugPrint("debounced u");
+        return;
+      }
+      gotValidQR = true;
       setState(() {
         result = scanData;
         widget.onDetect(scanData);
       });
+      gotValidQR = false;
     });
   }
 
