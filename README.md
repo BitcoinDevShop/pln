@@ -19,6 +19,7 @@ Here's our hackathon presentation: [slides](https://github.com/BitcoinDevShop/pl
 ## Deployment
 
 - [Docker](#docker)
+  - [DigitalOcean](#digitalocean)
 - [Source](#source)
 
 ### Source
@@ -48,6 +49,41 @@ If you want to build the Docker image locally:
 # build it!
 docker build -t bitcoindevshop/pln .
 ```
+
+```shell
+# run it in regtest mode!
+docker compose up
+```
+
+```shell
+# run it in testnet/mainnet mode!
+# this requires your own bitcoind instance running somewhere accessible
+# replace the values below
+
+docker run -e BITCOIND_RPC_HOST='127.0.0.1' \
+-e BITCOIND_RPC_PASSWORD='123' \
+-e BITCOIND_RPC_PORT='8443' \
+-e BITCOIND_RPC_USERNAME='admin1' \
+-e NETWORK='mainnet' \
+-e DATA_DIR='/mnt/ln-data' \
+-v .local/data:/mnt/ln-data \
+bitcoindevshop/pln
+```
+
+#### DigitalOcean
+
+You can set up a DigitalOcean instance for about ~$11 with a mainnet integrated prune bitcoind node using our Docker Compose script.
+
+1. Get the one click docker package on Digital Ocean: https://marketplace.digitalocean.com/apps/docker
+2. Use the following configurations, at minimum:
+	1. Basic CPU
+	2. Regular SSD
+	3. 2GB / 2 CPU / 50GB storage
+3. SSH into the machine when it is ready
+4. Pull down the repo:
+	1. `git clone https://github.com/BitcoinDevShop/pln.git && cd pln`
+6. Run docker compose for mainnet:
+	1. `docker-compose -f docker-compose.mainnet-prune.yaml up`
 
 ## Running Rust backend
 
