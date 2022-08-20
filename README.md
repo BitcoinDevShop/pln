@@ -46,7 +46,7 @@ If you want to build the Docker image locally:
 
 ```shell
 # build it!
-docker build -t BitcoinDevShop/pln .
+docker build -t bitcoindevshop/pln .
 ```
 
 ## Running Rust backend
