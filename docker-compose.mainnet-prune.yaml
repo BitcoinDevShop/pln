@@ -2,16 +2,15 @@ services:
   pln-backend:
     depends_on:
     - bitcoind
-    build:
-      context: '.'
+    image: ghcr.io/BitcoinDevShop/pln:latest
     environment:
       BITCOIND_RPC_HOST: bitcoind
       BITCOIND_RPC_PASSWORD: '123'
-      BITCOIND_RPC_PORT: '18443'
+      BITCOIND_RPC_PORT: '8443'
       BITCOIND_RPC_USERNAME: admin1
       DATA_DIR: /mnt/ln-data
-      DEVELOPMENT_MODE: 'true'
-      NETWORK: regtest
+      DEVELOPMENT_MODE: 'false'
+      NETWORK: bitcoin
     ports:
     - 5401:5401
     volumes:
@@ -21,24 +20,22 @@ services:
     image: ghcr.io/vulpemventures/bitcoin:latest
     user: 0:0
     command:
+    - -assumevalid=00000000000000000002e925949fff7f0e9b2c4bec484361db2e4e76da42b799 # verified on my own node, comment/change if you do not trust
     - -datadir=/mnt/data
-    - -regtest=1
-    - -dnsseed=0
     - -upnp=0
-    - -port=18444
-    - -rpcport=18443
+    - -port=8444
+    - -rpcport=8443
     - -server=1
-    - -txindex=1
     - -rpcuser=admin1
     - -rpcpassword=123
     - -rpcallowip=0.0.0.0/0
     - -rpcbind=0.0.0.0
     - -fallbackfee=0.00001
-    - -blockfilterindex=1
-    - -peerblockfilters=1
+    - -peerbloomfilters=1
+    - -prune=30000
     ports:
-    - 18443:18443
-    - 18444:18444
+    - 8443:8443
+    - 8444:8444
     volumes:
-    - .local/regtest:/mnt/data
+    - .local/mainnet:/mnt/data
     restart: unless-stopped
