@@ -11,6 +11,8 @@ services:
       DATA_DIR: /mnt/ln-data
       DEVELOPMENT_MODE: 'false'
       NETWORK: bitcoin
+    ports:
+    - 5401:5401
     volumes:
     - .local/ln_datae:/mnt/ln-data
 
@@ -29,10 +31,7 @@ services:
     - -rpcallowip=0.0.0.0/0
     - -rpcbind=0.0.0.0
     - -fallbackfee=0.00001
-    - -blockfilterindex=1
-    - -peerblockfilters=1
-    - -nopeerbloomfilters=1
-    - -peerbloomfilters=0
+    - -peerbloomfilters=1
     - -prune=30000
     ports:
     - 8443:8443

@@ -12,6 +12,8 @@ services:
       DATA_DIR: /mnt/ln-data
       DEVELOPMENT_MODE: 'true'
       NETWORK: regtest
+    ports:
+    - 5401:5401
     volumes:
     - .local/ln_datae:/mnt/ln-data
 

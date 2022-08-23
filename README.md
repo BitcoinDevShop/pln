@@ -83,7 +83,7 @@ You can set up a DigitalOcean instance for about ~$11 with a mainnet integrated 
 4. Pull down the repo:
 	1. `git clone https://github.com/BitcoinDevShop/pln.git && cd pln`
 6. Run docker compose for mainnet:
-	1. `docker-compose -f docker-compose.mainnet-prune.yaml up`
+	1. `docker-compose -f docker-compose.mainnet-prune.yaml up -d`
 
 ## Running Rust backend
 
