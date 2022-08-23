@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pln/constants.dart';
-import 'package:pln/grpc.dart';
-import 'package:pln/main.dart';
-import 'package:pln/pln_appbar.dart';
-import 'package:pln/widgets/button.dart';
-import 'package:pln/widgets/super_safe_area.dart';
-import 'package:pln/widgets/text_field.dart';
+import 'package:mutiny/constants.dart';
+import 'package:mutiny/grpc.dart';
+import 'package:mutiny/main.dart';
+import 'package:mutiny/pln_appbar.dart';
+import 'package:mutiny/widgets/button.dart';
+import 'package:mutiny/widgets/super_safe_area.dart';
+import 'package:mutiny/widgets/text_field.dart';
 
 class Welcome extends ConsumerWidget {
   const Welcome({Key? key}) : super(key: key);

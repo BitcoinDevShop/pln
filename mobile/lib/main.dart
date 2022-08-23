@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pln/constants.dart';
-import 'package:pln/data/prefs.dart';
-import 'package:pln/router.dart';
-import 'package:pln/theme.dart';
+import 'package:mutiny/constants.dart';
+import 'package:mutiny/data/prefs.dart';
+import 'package:mutiny/router.dart';
+import 'package:mutiny/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences prefs;

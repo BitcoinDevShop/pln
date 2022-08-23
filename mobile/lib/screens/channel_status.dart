@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pln/constants.dart';
-import 'package:pln/data/channel.dart';
-import 'package:pln/pln_appbar.dart';
-import 'package:pln/widgets/button.dart';
+import 'package:mutiny/constants.dart';
+import 'package:mutiny/data/channel.dart';
+import 'package:mutiny/pln_appbar.dart';
+import 'package:mutiny/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
-import 'package:pln/widgets/key_value.dart';
-import 'package:pln/widgets/super_safe_area.dart';
+import 'package:mutiny/widgets/key_value.dart';
+import 'package:mutiny/widgets/super_safe_area.dart';
 
 final channelStatusStreamProvider = StreamProvider.autoDispose<String?>((ref) {
   Stream<String?> getStatus() async* {

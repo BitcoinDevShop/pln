@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pln/generated/pln.pbgrpc.dart';
+import 'package:mutiny/generated/pln.pbgrpc.dart';
 import 'package:riverpod/riverpod.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:fixnum/fixnum.dart' show Int64;
-import 'package:pln/grpc.dart';
+import 'package:mutiny/grpc.dart';
 
 import '../grpc.dart';
 

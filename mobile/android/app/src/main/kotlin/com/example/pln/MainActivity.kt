@@ -1,4 +1,4 @@
-package com.example.pln
+package com.bitcoindevshop.mutiny
 
 import io.flutter.embedding.android.FlutterActivity
 

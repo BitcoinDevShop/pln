@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pln/constants.dart';
-import 'package:pln/pln_appbar.dart';
-import 'package:pln/widgets/super_safe_area.dart';
+import 'package:mutiny/constants.dart';
+import 'package:mutiny/pln_appbar.dart';
+import 'package:mutiny/widgets/super_safe_area.dart';
 
 class ErrorPage extends StatelessWidget {
   final Exception? errorReason;

@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:pln/main.dart';
-import 'package:pln/screens/channel_status.dart';
-import 'package:pln/screens/error_page.dart';
-import 'package:pln/screens/welcome.dart';
+import 'package:mutiny/main.dart';
+import 'package:mutiny/screens/channel_status.dart';
+import 'package:mutiny/screens/error_page.dart';
+import 'package:mutiny/screens/welcome.dart';
 
 import 'screens/deposit.dart';
 import 'screens/channel_fund.dart';
