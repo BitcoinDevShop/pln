@@ -411,6 +411,41 @@ impl ManagerService {
                                 status: "pending".to_string(),
                             });
                         }
+                    } else {
+                        // channels
+                        let list_channels_req = NodeRequest::ListChannels {
+                            pagination: PaginationRequest::default(),
+                        };
+                        let list_channels_resp = node.call(list_channels_req).await;
+                        if let Ok(list_channels_resp) = list_channels_resp {
+                            match list_channels_resp {
+                                senseicore::services::node::NodeResponse::ListChannels {
+                                    channels: chans,
+                                    ..
+                                } => {
+                                    println!(
+                                        "Failed to send payments with this node. Channels: {:?}",
+                                        chans
+                                    );
+                                }
+                                _ => {}
+                            };
+                        }
+
+                        // peers
+                        let peers_req = NodeRequest::ListPeers {};
+                        let peers_resp = node.call(peers_req).await;
+                        if let Ok(peers_resp) = peers_resp {
+                            match peers_resp {
+                                senseicore::services::node::NodeResponse::ListPeers { peers } => {
+                                    println!("Failed to send payment with this node. Peers:");
+                                    for peer in peers {
+                                        println!("{}", peer.node_pubkey);
+                                    }
+                                }
+                                _ => {}
+                            };
+                        }
                     }
                 }
 
