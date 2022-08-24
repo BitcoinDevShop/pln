@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pln/constants.dart';
-import 'package:pln/data/send.dart';
-import 'package:pln/pln_appbar.dart';
-import 'package:pln/widgets/button.dart';
+import 'package:mutiny/constants.dart';
+import 'package:mutiny/data/send.dart';
+import 'package:mutiny/pln_appbar.dart';
+import 'package:mutiny/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
-import 'package:pln/widgets/qr_scanner.dart';
-import 'package:pln/widgets/super_safe_area.dart';
-import 'package:pln/widgets/text_field.dart';
+import 'package:mutiny/widgets/qr_scanner.dart';
+import 'package:mutiny/widgets/super_safe_area.dart';
+import 'package:mutiny/widgets/text_field.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class SendScreen extends ConsumerWidget {

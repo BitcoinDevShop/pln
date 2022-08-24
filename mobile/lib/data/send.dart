@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pln/generated/pln.pbgrpc.dart';
+import 'package:mutiny/generated/pln.pbgrpc.dart';
 import 'package:riverpod/riverpod.dart';
 
 import 'package:bolt11_decoder/bolt11_decoder.dart';

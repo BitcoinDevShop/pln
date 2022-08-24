@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pln/constants.dart';
-import 'package:pln/pln_appbar.dart';
-import 'package:pln/widgets/button.dart';
+import 'package:mutiny/constants.dart';
+import 'package:mutiny/pln_appbar.dart';
+import 'package:mutiny/widgets/button.dart';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
-import 'package:pln/widgets/super_safe_area.dart';
+import 'package:mutiny/widgets/super_safe_area.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final Uri _url = Uri.parse('https://abytesjourney.com/lightning-privacy/');

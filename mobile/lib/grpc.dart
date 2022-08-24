@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:grpc/grpc.dart';
-import 'package:pln/generated/pln.pbgrpc.dart';
-import 'package:pln/main.dart';
+import 'package:mutiny/generated/pln.pbgrpc.dart';
+import 'package:mutiny/main.dart';
 
 final plnClientProvider =
     StateNotifierProvider<PlnClient, ManagerClient?>((ref) {
