@@ -9,7 +9,7 @@ jobs:
     uses: ./.github/workflows/docker_build.yaml
     with:
       repo: ${{ github.repository }}
-      version: ${{ github.ref }}
+      version: ${{ github.ref_name }}
       docker_registry: ghcr.io
     secrets:
       DOCKER_USER: ${{ github.actor }}
