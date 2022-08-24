@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../constants.dart';
 
@@ -17,26 +18,23 @@ class KeyValue extends StatelessWidget {
           color: white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(6.0)),
       padding: const EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
+      child: GestureDetector(
+        onTap: () => v != null ? Clipboard.setData(ClipboardData(text: v)) : {},
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
               k,
               style: Theme.of(context).textTheme.headline5,
             ),
-          ),
-          vw != null
-              ? vw!
-              : Flexible(
-                  child: Text(
+            vw != null
+                ? vw!
+                : Text(
                     v!,
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
                   ),
-                ),
-        ],
+          ],
+        ),
       ),
     );
   }

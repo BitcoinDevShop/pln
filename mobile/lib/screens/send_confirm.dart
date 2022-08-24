@@ -18,9 +18,13 @@ class SendConfirm extends ConsumerWidget {
     final sendNotifier = ref.read(sendProvider.notifier);
 
     Future<void> _sendPayment() async {
-      await sendNotifier.pay().then((_) {
-        context.go("/send/status");
-      });
+      try {
+        await sendNotifier.pay().then((_) {
+          context.go("/send/status");
+        });
+      } catch (e) {
+        context.go("/errormodal", extra: e);
+      }
     }
 
     return SuperSafeArea(
@@ -35,8 +39,8 @@ class SendConfirm extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const KeyValue(k: "WHO", v: "satoshis.place"),
-                  spacer12,
+                  // const KeyValue(k: "WHO", v: send?."unknown"),
+                  // spacer12,
                   KeyValue(
                       k: "HOW MUCH",
                       v: send?.amountSats != null

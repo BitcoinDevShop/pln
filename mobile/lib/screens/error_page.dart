@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mutiny/constants.dart';
 import 'package:mutiny/pln_appbar.dart';
+import 'package:mutiny/widgets/key_value.dart';
 import 'package:mutiny/widgets/super_safe_area.dart';
 
 class ErrorPage extends StatelessWidget {
@@ -18,12 +19,16 @@ class ErrorPage extends StatelessWidget {
         title: "ERROR",
         closeAction: () => context.go("/"),
       ),
-      child: Center(
-          child: errorReason != null
-              ? Text(errorReason.toString())
-              : errorMessage != null
-                  ? Text(errorMessage!)
-                  : const Text("Unknown Error")),
+      child: SingleChildScrollView(
+        child: Center(
+            child: KeyValue(
+                k: "WHY",
+                v: errorReason != null
+                    ? errorReason.toString()
+                    : errorMessage != null
+                        ? errorMessage!
+                        : "Unknown Error")),
+      ),
     );
   }
 }
