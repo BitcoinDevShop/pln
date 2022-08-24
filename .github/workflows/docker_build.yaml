@@ -3,10 +3,6 @@ name: Docker Image Build
 on:
   workflow_call:
     inputs:
-      repo:
-        description: The base repository
-        required: true
-        type: string
       version:
         description: The version for the build to be tagged with
         required: true
@@ -39,6 +35,10 @@ jobs:
       matrix:
         arch: [ amd64, arm64 ]
     steps:
+    - name: downcase REPO
+      run: |
+        echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
     - name: Checkout
       uses: actions/checkout@v2
       with:
@@ -60,12 +60,12 @@ jobs:
     - name: Build ${{ matrix.arch }} image
       run: |
         docker buildx build \
-          --label org.opencontainers.image.title=${{ github.repository }} \
+          --label org.opencontainers.image.title=${{ env.REPO }} \
           --label org.opencontainers.image.revision=${{ github.sha }} \
           --label org.opencontainers.image.version=${{ inputs.version }} \
           --platform linux/${{ matrix.arch }} \
           --file ${{ inputs.dockerfile_path }} \
-          --tag ${{ inputs.docker_registry }}/${{ inputs.repo }}:${{ inputs.version }}-${{ matrix.arch }} \
+          --tag ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }}-${{ matrix.arch }} \
           --push \
           ${{ inputs.context_path }}
 
@@ -73,6 +73,10 @@ jobs:
     needs: [ build_and_push ]
     runs-on: ubuntu-latest
     steps:
+    - name: downcase REPO
+      run: |
+        echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
 
@@ -89,7 +93,7 @@ jobs:
     - name: Create and push multi-platform manifest
       run: |
         docker manifest create \
-          ${{ inputs.docker_registry }}/${{ inputs.repo }}:${{ inputs.version }} \
-          ${{ inputs.docker_registry }}/${{ inputs.repo }}:${{ inputs.version }}-amd64 \
-          ${{ inputs.docker_registry }}/${{ inputs.repo }}:${{ inputs.version }}-arm64
-        docker manifest push ${{ inputs.docker_registry }}/${{ inputs.repo }}:${{ inputs.version }}
+          ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }} \
+          ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }}-amd64 \
+          ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }}-arm64
+        docker manifest push ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }}
