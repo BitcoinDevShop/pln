@@ -43,17 +43,21 @@ class _QRViewExampleState extends State<QRViewExample> {
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
       overlay: QrScannerOverlayShape(
-        borderColor: white,
-        borderRadius: 10,
+        borderColor: green,
+        borderRadius: 0,
         borderLength: 30,
-        borderWidth: 10,
+        borderWidth: 4,
         cutOutSize: scanArea,
       ),
     );
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
+    // When we navigate away we need to make sure the camera can be re-created on mount again
+    setState(() {
+      this.controller = controller;
+      controller.resumeCamera();
+    });
     controller.scannedDataStream.listen((scanData) {
       // This doesn't work but wish it did!
       if (gotValidQR) {
