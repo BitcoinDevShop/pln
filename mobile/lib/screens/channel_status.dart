@@ -48,17 +48,18 @@ class ChannelStatus extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              // Text(chann?.status ?? "..."),
-              KeyValue(
-                  k: "Channel Open Status",
-                  vw: channelStreamProvider.when(
-                      data: (data) =>
-                          Text(data ?? "no status something went wrong?"),
-                      loading: () => const Padding(
-                            padding: EdgeInsets.all(4.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                      error: (err, _) => Text(err.toString()))),
+              channelStreamProvider.when(
+                  data: (data) => KeyValue(
+                      k: "Channel Open Status",
+                      v: data ?? "no status something went wrong?"),
+                  loading: () => const KeyValue(
+                      k: "Channel Open Status",
+                      vw: Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: CircularProgressIndicator(),
+                      )),
+                  error: (err, _) =>
+                      KeyValue(k: "Channel Open Status", v: err.toString())),
               const SizedBox(height: 0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

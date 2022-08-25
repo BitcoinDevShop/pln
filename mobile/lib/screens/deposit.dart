@@ -53,43 +53,43 @@ class DepositScreen extends ConsumerWidget {
             accentColor: blue,
             title: "DEPOSIT",
             closeAction: () => context.go("/")),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24.0),
-              Column(
-                children: [
-                  Text(
-                      "Every deposit opens a new Lightning channel.\n\nEnter an amount and the node you'd like to open a channel with.",
-                      style: Theme.of(context).textTheme.headline2),
-                  spacer24,
-                  BlandTextField(
+        child: SingleChildScrollView(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24.0),
+                Column(
+                  children: [
+                    Text(
+                        "Every deposit opens a new Lightning channel.\n\nEnter an amount and the node you'd like to open a channel with.",
+                        style: Theme.of(context).textTheme.headline2),
+                    spacer24,
+                    BlandTextField(
+                        accentColor: blue,
+                        controller: targetNodeTextController,
+                        prompt: "Target Node",
+                        iconData: Icons.memory),
+                    spacer24,
+                    BlandTextField(
                       accentColor: blue,
-                      controller: targetNodeTextController,
-                      prompt: "Target Node",
-                      iconData: Icons.memory),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  BlandTextField(
-                    accentColor: blue,
-                    controller: sizeTextController,
-                    prompt: "How Much",
-                    iconData: Icons.expand,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BlandButton(
-                    text: "CONTINUE",
-                    onPressed: _create,
-                  )
-                ],
-              )
-            ]));
+                      controller: sizeTextController,
+                      prompt: "How Much",
+                      iconData: Icons.expand,
+                    ),
+                  ],
+                ),
+                spacer24,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BlandButton(
+                      text: "CONTINUE",
+                      onPressed: _create,
+                    )
+                  ],
+                )
+              ]),
+        ));
   }
 }
