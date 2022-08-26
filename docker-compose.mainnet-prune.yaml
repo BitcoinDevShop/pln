@@ -32,7 +32,7 @@ services:
     - -rpcbind=0.0.0.0
     - -fallbackfee=0.00001
     - -peerbloomfilters=1
-    - -prune=30000
+    - -prune=25000
     ports:
     - 8443:8443
     - 8444:8444
