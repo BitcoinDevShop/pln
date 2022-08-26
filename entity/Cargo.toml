@@ -9,9 +9,9 @@ name = "entity"
 path = "src/lib.rs"
 
 [dependencies]
-serde = { version = "1", features = ["derive"] }
+serde = { version = "^1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
-bdk = { git = "https://github.com/bitcoindevkit/bdk", rev = "fbd98b4c5a88a10f8dfc22b4c54187eba4d68afe" }
+bdk = "0.19"
 
 [dependencies.sea-orm]
 version = "^0.7.1"
