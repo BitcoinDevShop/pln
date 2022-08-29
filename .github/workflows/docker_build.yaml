@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [ amd64, arm64 ]
+        arch: [ amd64 ]
     steps:
     - name: downcase REPO
       run: |
@@ -94,6 +94,5 @@ jobs:
       run: |
         docker manifest create \
           ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }} \
-          ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }}-amd64 \
-          ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }}-arm64
+          ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }}-amd64
         docker manifest push ${{ inputs.docker_registry }}/${{ env.REPO }}:${{ inputs.version }}
