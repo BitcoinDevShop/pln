@@ -1,5 +1,7 @@
 # pLN - privacy is the only option
 
+[![Tags](https://github.com/BitcoinDevShop/pln/actions/workflows/tags.yaml/badge.svg)](https://github.com/BitcoinDevShop/pln/actions/workflows/tags.yaml)
+
 - Spin up a new node for every channel open
 - Fund channels with an external wallet, and no change!
 - Sending
