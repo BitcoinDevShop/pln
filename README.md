@@ -1,4 +1,4 @@
-# pLN - privacy is the only option
+# Mutiny (rename from pLN) - privacy is the only option
 
 [![Tags](https://github.com/BitcoinDevShop/pln/actions/workflows/tags.yaml/badge.svg)](https://github.com/BitcoinDevShop/pln/actions/workflows/tags.yaml)
 
