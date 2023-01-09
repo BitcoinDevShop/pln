@@ -2,6 +2,8 @@
 
 [![Tags](https://github.com/BitcoinDevShop/pln/actions/workflows/tags.yaml/badge.svg)](https://github.com/BitcoinDevShop/pln/actions/workflows/tags.yaml)
 
+## This project has been rewritten and moved here for the time being: https://github.com/BitcoinDevShop/mutiny-web-poc
+
 - Spin up a new node for every channel open
 - Fund channels with an external wallet, and no change!
 - Sending
